@@ -83,18 +83,20 @@ Environment variables (set in `.env`):
 
 - `STEMCELL_MODEL`: main agent model (default `gpt-5.5`)
 - `STEMCELL_TOOL_MODEL`: model used by the `single_shot` helper inside agent-authored scripts (default `gpt-5-mini`)
-- `STEMCELL_TEST_MODEL`: model used by domain `tests.py` if it implements LLM-as-judge (default `gpt-5.5`)
+- `STEMCELL_VERIFIER_MODEL`: model used by a domain `verifier.py` if it implements LLM-as-judge (default `gpt-5.5`)
 
 ## Layout
 
 ```
 stem/                      orchestrator + agent code (all immutable at runtime)
   agent/                   what defines the agent: BOOTSTRAP_PROMPT.md, base tools
-  orchestrator/            what runs the agent: phases, runner, workspace tracking, checkpoint creation, tests, stop criterion
+  orchestrator/            what runs the agent: phases, runner, workspace tracking, checkpoint creation, verifier loading, stop criterion
   helpers/                 helpers the agent imports from its authored scripts (e.g. llm.single_shot)
   __main__.py              CLI entry point (invoked as `python -m stem`)
 
-domains/                   domain definitions (one used per training run)
+domains/                   what the agent sees during training: DESCRIPTION.md, materials/, examples.yaml
+evals/                     held-out evals: examples.yaml, answers.yaml, verifier.py. NOT visible to the agent during training.
+test_setup/                runtime infrastructure per domain (docker-compose, data loaders, fixed data)
 
 agent_workspace/           mutable scratch for the in-progress training run
 checkpoints/               per-iteration snapshots of agent_workspace/
@@ -106,12 +108,64 @@ pyproject.toml             dependency manifest (managed by uv)
 
 ## Adding a new domain
 
-Create `domains/<name>/` with:
+A domain is the input contract. The simplest form has just a `domains/<name>/` directory:
 
-- `DESCRIPTION.md`: narrative description plus a `## Capabilities` section listing what the specialized agent must support (one bullet per capability, formatted `- <id>: <description>`)
-- `materials/`: supporting docs the agent reads during SELF_MODIFICATION (optional)
-- `tasks.yaml`: single set of test cases, each with an `id`, `capability`, `instruction`, and `verification: {function, ...}` reference
-- `tests.py`: Python module exposing the test functions named in `tasks.yaml` (can include LLM-as-judge patterns via `STEMCELL_TEST_MODEL`; can be omitted if no automatic verification is feasible)
+- `DESCRIPTION.md`: narrative description plus a `## Capabilities` section listing what the specialized agent must support (one bullet per capability, formatted `- <id>: <description>`).
+- `materials/`: supporting docs the agent reads during SELF_MODIFICATION (optional).
+- `examples.yaml`: concrete examples of the capabilities, each with an `id`, `capability`, `instruction`, and `verification: {function, ...}` reference. Each row is one instance the agent will be asked to solve.
+- `verifier.py`: Python module exposing the verification functions named in `examples.yaml` (can include LLM-as-judge patterns via `STEMCELL_VERIFIER_MODEL`; can be omitted if no automatic verification is feasible).
+
+For domains that need a strict train/eval split, add an `evals/<name>/` directory alongside:
+
+- `evals/<name>/examples.yaml`: held-out examples not visible to the agent during training. Mirrors `domains/<name>/examples.yaml` in capability and shape; differs in concrete parameter values.
+- `evals/<name>/answers.yaml`: expected outputs for all examples (training and eval). Hidden from the agent.
+- `evals/<name>/verifier.py`: verification functions. The orchestrator prefers this over `domains/<name>/verifier.py` when both exist.
+
+The orchestrator auto-detects `evals/<name>/` based on the domain directory name. Override with `--evals <path>`.
+
+## Running the security_analyst domain
+
+The included `security_analyst` domain analyzes synthetic security logs in OpenSearch. It's the demo domain for the train/eval split.
+
+One-time setup:
+
+```bash
+cd test_setup/security_analyst
+docker compose up -d
+```
+
+Wait for OpenSearch to be healthy (a few seconds), then load the training-period data:
+
+```bash
+python test_setup/security_analyst/load_data.py --mode train
+```
+
+Train the agent:
+
+```bash
+python -m stem train --domain domains/security_analyst
+```
+
+When the agent declares READY, swap to the eval-period data and evaluate:
+
+```bash
+python test_setup/security_analyst/load_data.py --mode eval
+python -m stem evaluate --domain domains/security_analyst
+```
+
+To compare against the naive baseline (same eval data, empty workspace, no domain knowledge):
+
+```bash
+python -m stem baseline --domain domains/security_analyst
+```
+
+Tear down when done:
+
+```bash
+docker compose -f test_setup/security_analyst/docker-compose.yaml down -v
+```
+
+The OpenSearch data is fixed and committed under `test_setup/security_analyst/data/`. The generator that produced it is gitignored: reproducing results requires running `load_data.py` against the committed NDJSON files, not regenerating from scratch.
 
 ---
 

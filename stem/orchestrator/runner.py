@@ -24,7 +24,7 @@ from stem.orchestrator.phases import (
 from stem.orchestrator.checkpoint import create_checkpoint
 from stem.orchestrator.status_tracker import StatusTracker
 from stem.orchestrator.stop_criterion import StopConfig, StopDecision, StopState, evaluate
-from stem.orchestrator.test_runner import load_tests_module, run_test
+from stem.orchestrator.test_runner import load_verifier_module, run_test
 from stem.orchestrator.workspace import (
     WorkspaceLayout,
     chmod_immutable,
@@ -43,6 +43,7 @@ class RunConfig:
     domain_dir: Path
     workspace_dir: Path
     checkpoints_dir: Path
+    evals_dir: Path | None = None
     model: str = "gpt-5.5"
     max_iterations: int = 50
     max_steps_per_iteration: int = 25
@@ -140,7 +141,7 @@ async def run_training(cfg: RunConfig, stop_cfg: StopConfig | None = None) -> di
     chmod_immutable(AGENT_CORE)
 
     domain = DomainDefinition.load(cfg.domain_dir)
-    tests_module = load_tests_module(domain.domain_dir) if domain.has_tests else None
+    tests_module = load_verifier_module(evals_dir=cfg.evals_dir, domain_dir=domain.domain_dir)
     tracker = StatusTracker(layout.status_file)
     tracker.initialize(domain.tasks, preserve_existing=not cfg.cleanup_workspace_at_start)
 
@@ -342,17 +343,15 @@ async def run_evaluation(
     *,
     workspace_dir: Path,
     domain_dir: Path,
+    evals_dir: Path | None = None,
     model: str = "gpt-5.5",
     max_steps_per_iteration: int = 25,
 ) -> dict:
-    """Run INFERENCE-style eval over a frozen workspace.
-
-    Suitable for: a READY agent in agent_workspace/, OR a saved agent at
-    trained_agents/<name>/.
-    """
+    """INFERENCE-style eval over a frozen workspace (the READY workspace or a saved agent)."""
     layout = WorkspaceLayout(workspace_dir)
-    domain = DomainDefinition.load(domain_dir)
-    tests_module = load_tests_module(domain.domain_dir) if domain.has_tests else None
+    examples_path = (evals_dir / "examples.yaml") if evals_dir is not None else None
+    domain = DomainDefinition.load(domain_dir, examples_path=examples_path)
+    tests_module = load_verifier_module(evals_dir=evals_dir, domain_dir=domain.domain_dir)
     instructions = _read_bootstrap_prompt()
     iter_state = IterationState()
 
@@ -414,14 +413,15 @@ async def run_evaluation(
 # ---------------------------------------------------------------------------
 
 async def run_naive_baseline(cfg: RunConfig) -> dict:
-    """Baseline: same agent code, empty workspace, writes disabled, base tools only."""
+    """Empty workspace, base tools only, run against the eval-mode examples."""
     workspace_dir = cfg.workspace_dir.parent / (cfg.workspace_dir.name + "_baseline")
     _ensure_clean_workspace(workspace_dir)
     layout = WorkspaceLayout(workspace_dir)
     layout.ensure()
 
-    domain = DomainDefinition.load(cfg.domain_dir)
-    tests_module = load_tests_module(domain.domain_dir) if domain.has_tests else None
+    examples_path = (cfg.evals_dir / "examples.yaml") if cfg.evals_dir is not None else None
+    domain = DomainDefinition.load(cfg.domain_dir, examples_path=examples_path)
+    tests_module = load_verifier_module(evals_dir=cfg.evals_dir, domain_dir=domain.domain_dir)
     instructions = _read_bootstrap_prompt()
     iter_state = IterationState()
 

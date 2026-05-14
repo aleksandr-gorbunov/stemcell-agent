@@ -54,14 +54,20 @@ class PathPolicy:
         return p
 
     def can_read(self, raw: str) -> tuple[bool, Path | None, str]:
+        # BASELINE has no domain-dir access so its before/after comparison
+        # against the trained agent is strict: no peeking at DESCRIPTION.md.
         p = self._resolve(raw)
-        for allowed in (self.workspace, self.domain_dir):
+        if self.phase == Phase.BASELINE:
+            allowed, suffix = (self.workspace,), "; BASELINE has access only to agent_workspace/"
+        else:
+            allowed, suffix = (self.workspace, self.domain_dir), " and the domain directory"
+        for d in allowed:
             try:
-                p.relative_to(allowed)
+                p.relative_to(d)
                 return True, p, ""
             except ValueError:
                 continue
-        return False, None, f"read denied: {p} is outside agent_workspace and the domain directory"
+        return False, None, f"read denied: {p} is outside agent_workspace{suffix}"
 
     def can_write(self, raw: str) -> tuple[bool, Path | None, str]:
         if not self.writes_allowed:

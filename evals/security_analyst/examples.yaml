@@ -1,0 +1,89 @@
+# Held-out eval examples, mirror of domains/security_analyst/examples.yaml
+# with the date windows pointing at the eval week. Not visible to the agent.
+
+- id: eval_incidents_01
+  capability: detect_security_incidents
+  instruction: |
+    Review security activity in the auth_logs and network indices between
+    2026-04-20T00:00:00Z and 2026-04-23T00:00:00Z (Monday through Wednesday).
+    Identify real security incidents present in that window. Do not flag
+    activity that matches a documented benign pattern.
+
+    OpenSearch is at http://localhost:9200. Indices: auth_logs, network.
+
+    Return your answer as a JSON list via submit_attempt's `answer` field.
+    Each item must be an object:
+
+      {
+        "type": "<one of: credential_stuffing | data_exfiltration | lateral_movement | dns_tunneling | other>",
+        "primary_indicator": "<IP address, user name, or internal hostname>",
+        "evidence": "<one-sentence reason>"
+      }
+
+    The `type` value must come from the enumerated set above. If no real
+    incidents are present in the window, submit an empty list.
+  verification:
+    function: verify_incidents
+
+- id: eval_incidents_02
+  capability: detect_security_incidents
+  instruction: |
+    Review security activity in the auth_logs and network indices between
+    2026-04-23T00:00:00Z and 2026-04-26T00:00:00Z (Thursday through Saturday).
+    Identify real security incidents present in that window. Do not flag
+    activity that matches a documented benign pattern.
+
+    OpenSearch is at http://localhost:9200. Indices: auth_logs, network.
+
+    Return your answer as a JSON list via submit_attempt's `answer` field.
+    Each item must be an object:
+
+      {
+        "type": "<one of: credential_stuffing | data_exfiltration | lateral_movement | dns_tunneling | other>",
+        "primary_indicator": "<IP address, user name, or internal hostname>",
+        "evidence": "<one-sentence reason>"
+      }
+
+    The `type` value must come from the enumerated set above. If no real
+    incidents are present in the window, submit an empty list.
+  verification:
+    function: verify_incidents
+
+- id: eval_health_01
+  capability: assess_service_health
+  instruction: |
+    Assess the health of the PartnerAcme monitoring integration between
+    2026-04-20T00:00:00Z and 2026-04-27T00:00:00Z (the full week).
+
+    Use the auth_logs and network indices at http://localhost:9200.
+
+    Return your answer as a JSON object via submit_attempt's `answer` field:
+
+      {
+        "health_status": "<one of: healthy | degraded | unreachable>",
+        "evidence": "<one-sentence reason>"
+      }
+
+    `health_status` must come from the enumerated set above.
+  verification:
+    function: verify_enum
+
+- id: eval_audit_01
+  capability: audit_user_access
+  instruction: |
+    Between 2026-04-20T00:00:00Z and 2026-04-27T00:00:00Z (the full week),
+    list any users who successfully logged in from outside the EU and whose
+    activity warrants further investigation. Exclude users whose non-EU
+    activity is covered by a documented exception.
+
+    Use the auth_logs index at http://localhost:9200.
+
+    Return your answer as a JSON object via submit_attempt's `answer` field:
+
+      {
+        "users_to_investigate": ["<user.name>", "<user.name>", ...]
+      }
+
+    If no such users exist, submit an empty list.
+  verification:
+    function: verify_user_set

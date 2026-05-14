@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 .env
+.claude
+.DS_Store
+.pytest_cache/
+
 agent_workspace/*
 !agent_workspace/.gitkeep
 checkpoints/*
@@ -11,8 +15,9 @@ trained_agents/*
 domains/example/*
 !domains/example/.gitkeep
 results/
-.pytest_cache/
-.DS_Store
+_check_workspace/
+
+# Private working docs (not part of the submission)
 DESIGN.md
 BUILD_LOG.md
 TODO.md

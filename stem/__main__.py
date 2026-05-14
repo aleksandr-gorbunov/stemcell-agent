@@ -34,9 +34,20 @@ def _resolve_domain_dir(value: str) -> Path:
         raise SystemExit(f"domain directory not found: {p}")
     if not (p / "DESCRIPTION.md").exists():
         raise SystemExit(f"domain {p} is missing DESCRIPTION.md")
-    if not (p / "tasks.yaml").exists():
-        raise SystemExit(f"domain {p} is missing tasks.yaml")
+    if not (p / "examples.yaml").exists():
+        raise SystemExit(f"domain {p} is missing examples.yaml")
     return p
+
+
+def _resolve_evals_dir(args, domain_dir: Path) -> Path | None:
+    """Use --evals if given, else evals/<domain_name>/ if it exists, else None."""
+    if getattr(args, "evals_dir", None):
+        p = Path(args.evals_dir).resolve()
+        if not p.exists() or not p.is_dir():
+            raise SystemExit(f"evals directory not found: {p}")
+        return p
+    candidate = (REPO_ROOT / "evals" / domain_dir.name).resolve()
+    return candidate if candidate.is_dir() else None
 
 
 def _default_workspace() -> Path:
@@ -51,13 +62,14 @@ def _default_trained_agents() -> Path:
     return (REPO_ROOT / "trained_agents").resolve()
 
 
-def _build_runconfig(args, *, domain_dir: Path) -> RunConfig:
+def _build_runconfig(args, *, domain_dir: Path, evals_dir: Path | None) -> RunConfig:
     workspace = Path(args.workspace).resolve() if args.workspace else _default_workspace()
     checkpoints = Path(args.checkpoints).resolve() if args.checkpoints else _default_checkpoints(domain_dir)
     return RunConfig(
         domain_dir=domain_dir,
         workspace_dir=workspace,
         checkpoints_dir=checkpoints,
+        evals_dir=evals_dir,
         model=args.model or os.environ.get("STEMCELL_MODEL", "gpt-5.5"),
         max_iterations=args.max_iterations,
         cleanup_workspace_at_start=not getattr(args, "resume", False),
@@ -71,6 +83,13 @@ def add_common_args(p: argparse.ArgumentParser, *, require_domain: bool = True) 
         required=require_domain,
         help="Path to domains/<name>/ directory",
     )
+    p.add_argument(
+        "--evals",
+        dest="evals_dir",
+        help=("Path to evals/<name>/ directory holding the held-out examples and "
+              "verifier. Defaults to ./evals/<domain_name>/ if it exists. Omit when "
+              "the domain has no evals split (verifier lives in the domain itself)."),
+    )
     p.add_argument("--workspace", help="Override workspace path (default: ./agent_workspace)")
     p.add_argument("--checkpoints", help="Override checkpoints path (default: ./checkpoints/<domain>)")
     p.add_argument("--model", help="Override main agent model (STEMCELL_MODEL)")
@@ -83,7 +102,8 @@ def add_common_args(p: argparse.ArgumentParser, *, require_domain: bool = True) 
 
 def cmd_train(args) -> int:
     domain_dir = _resolve_domain_dir(args.domain_dir)
-    runcfg = _build_runconfig(args, domain_dir=domain_dir)
+    evals_dir = _resolve_evals_dir(args, domain_dir)
+    runcfg = _build_runconfig(args, domain_dir=domain_dir, evals_dir=evals_dir)
     stopcfg = StopConfig(budget_max_iterations=args.max_iterations)
     summary = asyncio.run(run_training(runcfg, stopcfg))
     print(json.dumps(summary, indent=2, default=str))
@@ -114,9 +134,11 @@ def cmd_evaluate(args) -> int:
             raise SystemExit(f"agent workspace not found: {ws}")
         domain_dir = _resolve_domain_dir(args.domain_dir)
 
+    evals_dir = _resolve_evals_dir(args, domain_dir)
     summary = asyncio.run(run_evaluation(
         workspace_dir=ws,
         domain_dir=domain_dir,
+        evals_dir=evals_dir,
         model=args.model or os.environ.get("STEMCELL_MODEL", "gpt-5.5"),
     ))
     print(json.dumps(summary, indent=2, default=str))
@@ -150,7 +172,8 @@ def cmd_reject(args) -> int:
 
 def cmd_baseline(args) -> int:
     domain_dir = _resolve_domain_dir(args.domain_dir)
-    runcfg = _build_runconfig(args, domain_dir=domain_dir)
+    evals_dir = _resolve_evals_dir(args, domain_dir)
+    runcfg = _build_runconfig(args, domain_dir=domain_dir, evals_dir=evals_dir)
     summary = asyncio.run(run_naive_baseline(runcfg))
     print(json.dumps(summary, indent=2, default=str))
     return 0

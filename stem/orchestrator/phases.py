@@ -8,6 +8,12 @@ from pathlib import Path
 import yaml
 
 
+# `DomainDefinition.tasks` holds the list of concrete examples (one per row of
+# examples.yaml). The user-facing file name is `examples.yaml`; the Python
+# attribute stays `tasks` to align with the agent's `submit_attempt(task_id=...)`
+# API and the bootstrap prompt's vocabulary.
+
+
 @dataclass
 class DomainDefinition:
     name: str
@@ -16,51 +22,36 @@ class DomainDefinition:
     capabilities: list[dict]
     reference_materials: list[Path]
     tasks: list[dict]
-    has_tests: bool
 
     @classmethod
-    def load(cls, domain_dir: Path) -> "DomainDefinition":
+    def load(cls, domain_dir: Path, examples_path: Path | None = None) -> "DomainDefinition":
         description_path = domain_dir / "DESCRIPTION.md"
         if not description_path.exists():
             raise FileNotFoundError(f"domain missing DESCRIPTION.md: {domain_dir}")
         description_text = description_path.read_text()
-        capabilities = _parse_capabilities_section(description_text)
 
         materials_dir = domain_dir / "materials"
-        if not materials_dir.exists():
-            # Fall back to legacy reference_materials/ name if present.
-            legacy = domain_dir / "reference_materials"
-            materials_dir = legacy if legacy.exists() else materials_dir
         reference_materials = sorted(materials_dir.glob("*")) if materials_dir.exists() else []
 
-        tasks_path = domain_dir / "tasks.yaml"
-        tasks = yaml.safe_load(tasks_path.read_text()) if tasks_path.exists() else []
-
-        tests_present = (domain_dir / "tests.py").exists()
+        if examples_path is None:
+            examples_path = domain_dir / "examples.yaml"
+        tasks = yaml.safe_load(examples_path.read_text()) if examples_path.exists() else []
 
         return cls(
             name=domain_dir.name,
             domain_dir=domain_dir,
             description_text=description_text,
-            capabilities=capabilities,
+            capabilities=_parse_capabilities_section(description_text),
             reference_materials=reference_materials,
             tasks=tasks or [],
-            has_tests=tests_present,
         )
 
 
 def _parse_capabilities_section(description: str) -> list[dict]:
-    """Find the '## Capabilities' section in DESCRIPTION.md and parse bulleted lines.
-
-    Each capability line looks like:
-        - <id>: <description>
-    Returns a list of {"id": ..., "description": ...} dicts. If no section is
-    present or no lines match, returns an empty list — this is allowed.
-    """
-    lines = description.splitlines()
+    """Parse `- <id>: <description>` bullets under `## Capabilities`. Empty if absent."""
     in_section = False
     caps: list[dict] = []
-    for ln in lines:
+    for ln in description.splitlines():
         if ln.strip().lower().startswith("## capabilities"):
             in_section = True
             continue
@@ -74,7 +65,7 @@ def _parse_capabilities_section(description: str) -> list[dict]:
                     cid, desc = rest.split(":", 1)
                     caps.append({"id": cid.strip(), "description": desc.strip()})
                 else:
-                    caps.append({"id": rest.strip(), "description": ""})
+                    caps.append({"id": rest, "description": ""})
     return caps
 
 
