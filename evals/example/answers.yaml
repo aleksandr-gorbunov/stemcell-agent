@@ -1,0 +1,14 @@
+# Expected answers per task instance, keyed by task id. Covers both the
+# training instances (../../domains/<name>/examples.yaml) and the eval
+# instances (./examples.yaml). The verifier reads this file at task-check
+# time. Never visible to the agent.
+
+<train_task_id_1>:
+  function: <verifier_function_name>
+  expected:
+    <whatever the verifier function expects, free-form per function>
+
+<eval_task_id_1>:
+  function: <verifier_function_name>
+  expected:
+    <expected values for this held-out instance>

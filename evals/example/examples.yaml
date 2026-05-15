@@ -1,0 +1,19 @@
+# Held-out task instances the agent is evaluated against. Same shape as
+# ../../domains/<name>/examples.yaml but with different specific parameter
+# values, so what the agent learned during training has to generalize rather
+# than memorize. Never read by the agent during training.
+
+- id: <eval_task_id_1>
+  capability: <capability_id_1>
+  instruction: |
+    Same instruction template as the corresponding training instance, with
+    different concrete values (different window, different parameters, etc.).
+  verification:
+    function: <verifier_function_name>
+
+- id: <eval_task_id_2>
+  capability: <capability_id_2>
+  instruction: |
+    Another held-out instance for a different capability.
+  verification:
+    function: <verifier_function_name>
