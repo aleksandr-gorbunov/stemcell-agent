@@ -1,0 +1,28 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 9,
+    "failed": 1,
+    "unattempted": 1,
+    "attempted_at_least_once": 10,
+    "pass_rate": 0.8181818181818182
+  },
+  "attempts": [
+    {
+      "task_id": "train_compromise_02",
+      "summary": "Ran the sec_analytics investigate subcommand against OpenSearch for cto@example.com from 2026-04-13 to 2026-04-20; tool found no auth-side compromise indicators and therefore ignored unrelated post-login anomalies, yielding low likelihood.",
+      "answer": {
+        "user": "cto@example.com",
+        "compromise_likelihood": "low",
+        "evidence": []
+      },
+      "passed": true,
+      "details": "matched user=cto@example.com likelihood=low evidence_hits=0/0"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:46:56+00:00",
+  "iteration": 22
+}

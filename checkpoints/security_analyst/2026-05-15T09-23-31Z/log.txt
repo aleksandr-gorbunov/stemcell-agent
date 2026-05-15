@@ -1,0 +1,40 @@
+[2026-05-15T09:23:31.440008+00:00] initialization iter=0
+[2026-05-15T09:24:03.406015+00:00] self_modification iter=1
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:26:07.380560+00:00] self_testing iter=2
+  attempted train_dns_01: FAIL -- missing: dns_tunneling/10.0.2.45
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:26:46.534768+00:00] self_modification iter=3
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:27:50.893381+00:00] self_testing iter=4
+  attempted train_audit_02: FAIL -- missing: ['user042@example.com']
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:28:10.076183+00:00] self_modification iter=5
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:30:04.486069+00:00] self_testing iter=6
+  attempted train_health_01: FAIL -- expected 'healthy', got 'unreachable'
+  attempted train_health_01: FAIL -- expected 'healthy', got 'degraded'
+  attempted train_health_01: PASS -- matched 'healthy'
+[2026-05-15T09:31:10.828521+00:00] self_testing iter=7
+  attempted train_dns_01: FAIL -- missing: dns_tunneling/10.0.2.45
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:31:30.566019+00:00] self_modification iter=8
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:32:43.517470+00:00] self_testing iter=9
+  attempted train_compromise_01: FAIL -- likelihood mismatch: expected 'high', got 'low'
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:33:17.150830+00:00] self_modification iter=10
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:34:36.573203+00:00] self_testing iter=11
+  attempted train_incidents_03: FAIL -- missing: credential_stuffing/203.0.113.42, data_exfiltration/10.0.4.22, dns_tunneling/10.0.2.45
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:36:08.730932+00:00] self_modification iter=12
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:37:24.803171+00:00] self_testing iter=13
+  attempted train_audit_02: FAIL -- missing: ['user042@example.com']
+  phase transition: self_testing -> self_modification
+[2026-05-15T09:37:51.506747+00:00] self_modification iter=14
+  phase transition: self_modification -> self_testing
+[2026-05-15T09:39:50.965594+00:00] self_testing iter=15
+  phase transition: self_testing -> self_modification
+  stop_check: architectural_failure -- no measurable improvement over last 10 iters at pass_rate=0.09

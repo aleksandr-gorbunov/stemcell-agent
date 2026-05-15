@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_dns_01",
+      "summary": "Ran sec_analytics dns-tunnel detector across 2026-04-13 to 2026-04-20; verified hit details; formatted result per schema.",
+      "answer": [
+        {
+          "type": "dns_tunneling",
+          "primary_indicator": "10.0.2.45",
+          "evidence": "10.0.2.45 generated ~1,500 DNS queries to data-corp.io with 1,500 unique subdomains and 73% TXT records, a pattern consistent with DNS tunneling."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:48:15+00:00",
+  "iteration": 28
+}

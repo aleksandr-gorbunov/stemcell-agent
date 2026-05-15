@@ -1,0 +1,105 @@
+[2026-05-15T10:35:11.842143+00:00] initialization iter=0
+[2026-05-15T10:35:43.794545+00:00] self_modification iter=1
+  phase transition: self_modification -> self_testing
+[2026-05-15T10:37:57.114881+00:00] self_testing iter=2
+  attempted train_audit_01: PASS -- matched ['user042@example.com']
+[2026-05-15T10:38:16.748789+00:00] self_testing iter=3
+  attempted train_audit_01: PASS -- matched ['user042@example.com']
+[2026-05-15T10:38:26.644258+00:00] self_testing iter=4
+  attempted train_incidents_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:38:36.701425+00:00] self_testing iter=5
+  attempted train_lateral_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:38:58.009227+00:00] self_testing iter=6
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:39:10.346662+00:00] self_testing iter=7
+  attempted train_incidents_03: PASS -- matched 4 real incidents, no leaks
+[2026-05-15T10:39:19.904465+00:00] self_testing iter=8
+  attempted train_lateral_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:39:35.016343+00:00] self_testing iter=9
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:39:55.046257+00:00] self_testing iter=10
+  attempted train_audit_02: PASS -- matched ['user042@example.com']
+[2026-05-15T10:40:07.732372+00:00] self_testing iter=11
+  attempted train_incidents_02: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:40:22.226165+00:00] self_testing iter=12
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:40:35.383431+00:00] self_testing iter=13
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:40:54.752582+00:00] self_testing iter=14
+  attempted train_incidents_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:41:07.018790+00:00] self_testing iter=15
+  attempted train_audit_02: PASS -- matched ['user042@example.com']
+[2026-05-15T10:41:17.165000+00:00] self_testing iter=16
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:41:27.492451+00:00] self_testing iter=17
+  attempted train_compromise_01: FAIL -- likelihood mismatch: expected 'high', got 'low'
+  phase transition: self_testing -> self_modification
+[2026-05-15T10:42:01.434558+00:00] self_modification iter=18
+  phase transition: self_modification -> self_testing
+[2026-05-15T10:44:32.228837+00:00] self_testing iter=19
+  attempted train_compromise_02: FAIL -- likelihood mismatch: expected 'low', got 'medium'
+  phase transition: self_testing -> self_modification
+[2026-05-15T10:44:56.160736+00:00] self_modification iter=20
+  phase transition: self_modification -> self_testing
+[2026-05-15T10:46:44.701282+00:00] self_testing iter=21
+  attempted train_compromise_02: PASS -- matched user=cto@example.com likelihood=low evidence_hits=0/0
+[2026-05-15T10:46:56.962419+00:00] self_testing iter=22
+  attempted train_incidents_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:47:06.721251+00:00] self_testing iter=23
+  attempted train_health_01: PASS -- matched 'healthy'
+[2026-05-15T10:47:17.726323+00:00] self_testing iter=24
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:47:28.996811+00:00] self_testing iter=25
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:47:39.451854+00:00] self_testing iter=26
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:47:48.256397+00:00] self_testing iter=27
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:48:15.265599+00:00] self_testing iter=28
+  attempted train_incidents_02: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:48:32.215880+00:00] self_testing iter=29
+  attempted train_incidents_03: PASS -- matched 4 real incidents, no leaks
+[2026-05-15T10:48:47.122967+00:00] self_testing iter=30
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:49:04.795847+00:00] self_testing iter=31
+  attempted train_incidents_03: PASS -- matched 4 real incidents, no leaks
+[2026-05-15T10:49:21.836061+00:00] self_testing iter=32
+  attempted train_audit_01: PASS -- matched ['user042@example.com']
+[2026-05-15T10:49:34.002463+00:00] self_testing iter=33
+  attempted train_audit_02: PASS -- matched ['user042@example.com']
+[2026-05-15T10:49:56.945228+00:00] self_testing iter=34
+  attempted train_compromise_01: FAIL -- likelihood mismatch: expected 'high', got 'low'
+  phase transition: self_testing -> self_modification
+[2026-05-15T10:50:40.804098+00:00] self_modification iter=35
+  phase transition: self_modification -> self_testing
+[2026-05-15T10:52:22.877275+00:00] self_testing iter=36
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:52:47.672650+00:00] self_testing iter=37
+  attempted train_incidents_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:53:01.909721+00:00] self_testing iter=38
+  attempted train_audit_01: PASS -- matched ['user042@example.com']
+[2026-05-15T10:53:17.223232+00:00] self_testing iter=39
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:53:53.567481+00:00] self_testing iter=40
+  attempted train_incidents_02: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:54:14.756661+00:00] self_testing iter=41
+  attempted train_dns_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:54:45.732605+00:00] self_testing iter=42
+  attempted train_incidents_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:55:02.069979+00:00] self_testing iter=43
+  attempted train_audit_02: PASS -- matched ['user042@example.com']
+[2026-05-15T10:55:18.028233+00:00] self_testing iter=44
+  attempted train_incidents_02: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:55:33.491412+00:00] self_testing iter=45
+  attempted train_audit_01: PASS -- matched ['user042@example.com']
+[2026-05-15T10:55:51.736841+00:00] self_testing iter=46
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:56:06.178665+00:00] self_testing iter=47
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:56:14.240616+00:00] self_testing iter=48
+  attempted train_health_02: PASS -- matched 'healthy'
+[2026-05-15T10:56:22.147998+00:00] self_testing iter=49
+  attempted train_lateral_01: PASS -- matched 1 real incidents, no leaks
+[2026-05-15T10:56:36.965170+00:00] self_testing iter=50
+  attempted train_compromise_02: PASS -- matched user=cto@example.com likelihood=low evidence_hits=0/0
+  stop_check: budget_exceeded -- hit max iterations (50)

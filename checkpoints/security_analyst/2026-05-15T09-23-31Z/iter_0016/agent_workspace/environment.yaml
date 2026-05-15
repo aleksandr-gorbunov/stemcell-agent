@@ -1,0 +1,21 @@
+es:
+  base_url: http://localhost:9200
+  indices:
+    auth: auth_logs
+    net: network
+    dns: dns
+auth:
+  # reserved for future credentials if needed
+  username: ""
+  password: ""
+policy:
+  eu_country_codes: ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE"]
+exceptions:
+  travel:
+    - user: cfo@example.com
+      start: 2026-04-15T00:00:00Z
+      end: 2026-04-17T23:59:59Z
+      countries: ["SG"]
+  vpn_cidrs:
+    - 203.0.113.0/24
+    - 198.51.100.0/24

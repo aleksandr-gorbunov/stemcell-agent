@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 3,
+    "failed": 0,
+    "unattempted": 8,
+    "attempted_at_least_once": 3,
+    "pass_rate": 0.2727272727272727
+  },
+  "attempts": [
+    {
+      "task_id": "train_lateral_01",
+      "summary": "Ran the sec_analytics lateral movement detector over the specified window and validated the source host context via an ad-hoc OpenSearch query. The tool already excludes backup/CI-CD windows.",
+      "answer": [
+        {
+          "type": "lateral_movement",
+          "primary_indicator": "10.0.3.30",
+          "evidence": "Unusual fan-out: 68 unique internal destinations not typical for this host during 2026-04-13 to 2026-04-20 (backup/CI/CD excluded), totaling 498,578 bytes out."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:38:58+00:00",
+  "iteration": 6
+}

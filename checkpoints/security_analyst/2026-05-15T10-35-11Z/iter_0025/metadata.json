@@ -1,0 +1,27 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_health_02",
+      "summary": "Used sec_analytics health-cicd subcommand to analyze network and dns indices for 2026-04-13..2026-04-20; tool reported healthy with expected weekday activity and no weekend expectations.",
+      "answer": {
+        "health_status": "healthy",
+        "evidence": "Expected weekday builds (2026-04-13 to 2026-04-17) show 10.0.0.40 contacting app/db and external services; no weekend runs expected or observed (2026-04-18\u20132026-04-19)."
+      },
+      "passed": true,
+      "details": "matched 'healthy'"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:47:28+00:00",
+  "iteration": 25
+}

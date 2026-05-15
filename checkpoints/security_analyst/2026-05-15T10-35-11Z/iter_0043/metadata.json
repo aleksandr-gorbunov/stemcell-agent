@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_01",
+      "summary": "Queried incidents aggregator in skills/sec_analytics/tools/analyze.py over 2026-04-13T00:00:00Z to 2026-04-15T00:00:00Z. It flagged one source IP with a high-volume, multi-user auth failure burst and no benign allowlist match. No data exfiltration, lateral movement, or DNS tunneling met thresholds in this window.",
+      "answer": [
+        {
+          "type": "credential_stuffing",
+          "primary_indicator": "203.0.113.42",
+          "evidence": "520 failed login attempts across 118 users between 2026-04-13 and 2026-04-15."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:55:02+00:00",
+  "iteration": 43
+}

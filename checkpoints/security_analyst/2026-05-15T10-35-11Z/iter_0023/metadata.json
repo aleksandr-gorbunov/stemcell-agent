@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 9,
+    "failed": 1,
+    "unattempted": 1,
+    "attempted_at_least_once": 10,
+    "pass_rate": 0.8181818181818182
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_01",
+      "summary": "Ran sec_analytics incidents detector over 2026-04-13 to 2026-04-15 and mapped results to required schema.",
+      "answer": [
+        {
+          "type": "credential_stuffing",
+          "primary_indicator": "203.0.113.42",
+          "evidence": "520 failed logins across 118 users."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:47:06+00:00",
+  "iteration": 23
+}

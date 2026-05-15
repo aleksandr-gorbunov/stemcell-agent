@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 2,
+    "failed": 0,
+    "unattempted": 9,
+    "attempted_at_least_once": 2,
+    "pass_rate": 0.18181818181818182
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_01",
+      "summary": "Ran sec_analytics incidents against OpenSearch for 2026-04-13..2026-04-15 and formatted results per schema.",
+      "answer": [
+        {
+          "type": "credential_stuffing",
+          "primary_indicator": "203.0.113.42",
+          "evidence": "520 failed logins across 118 users"
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:38:36+00:00",
+  "iteration": 5
+}

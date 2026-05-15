@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 8,
+    "failed": 0,
+    "unattempted": 3,
+    "attempted_at_least_once": 8,
+    "pass_rate": 0.7272727272727273
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_01",
+      "summary": "Used sec_analytics incidents detector over 2026-04-13 to 2026-04-15. It excludes documented benign patterns. One real incident surfaced: large-scale failed login attempts from a single external IP across many accounts, consistent with credential stuffing.",
+      "answer": [
+        {
+          "type": "credential_stuffing",
+          "primary_indicator": "203.0.113.42",
+          "evidence": "520 failed logins across 118 users between 2026-04-13 and 2026-04-15, consistent with credential stuffing."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:41:07+00:00",
+  "iteration": 15
+}

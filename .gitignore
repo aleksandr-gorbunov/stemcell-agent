@@ -8,12 +8,24 @@ __pycache__/
 
 agent_workspace/*
 !agent_workspace/.gitkeep
+
 checkpoints/*
 !checkpoints/.gitkeep
+!checkpoints/security_analyst/
+checkpoints/security_analyst/*
+!checkpoints/security_analyst/2026-05-15T10-35-11Z/
+!checkpoints/security_analyst/2026-05-15T09-23-31Z/
+
 trained_agents/*
 !trained_agents/.gitkeep
 !trained_agents/vanilla/
-results/
+!trained_agents/security_analyst_gpt5/
+
+results/*
+!results/train_2026-05-15T10-58-16Z.json
+!results/evaluate_2026-05-15T11-04-59Z.json
+!results/evaluate_2026-05-15T11-16-04Z.json
+
 _check_workspace/
 
 DESIGN.md

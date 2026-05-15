@@ -1,0 +1,27 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_health_02",
+      "summary": "Ran sec_analytics health-cicd over 2026-04-13..2026-04-20 against network and dns on http://localhost:9200; mapped tool status to required schema.",
+      "answer": {
+        "health_status": "healthy",
+        "evidence": "From 2026-04-13 to 2026-04-17 (03:00\u201304:00 UTC), CI host 10.0.0.40 connected to app, DB, and allowed external CIDRs each weekday; no runs expected on the weekend."
+      },
+      "passed": true,
+      "details": "matched 'healthy'"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:56:06+00:00",
+  "iteration": 47
+}

@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 8,
+    "failed": 0,
+    "unattempted": 3,
+    "attempted_at_least_once": 8,
+    "pass_rate": 0.7272727272727273
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_02",
+      "summary": "Ran sec_analytics incidents detector against OpenSearch for 2026-04-15 to 2026-04-17 and returned only real incidents, excluding benign patterns per allowlists.",
+      "answer": [
+        {
+          "type": "data_exfiltration",
+          "indicator": "10.0.4.22",
+          "evidence": "850297816 bytes to external destinations"
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:40:22+00:00",
+  "iteration": 12
+}

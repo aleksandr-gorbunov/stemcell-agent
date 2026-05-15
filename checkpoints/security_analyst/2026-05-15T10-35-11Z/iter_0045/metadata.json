@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_02",
+      "summary": "Ran sec_analytics incidents detector over the specified window to aggregate auth, network, and DNS signals; filtered out allowlisted/benign patterns. Returned detected incident list.",
+      "answer": [
+        {
+          "type": "data_exfiltration",
+          "indicator": "10.0.4.22",
+          "evidence": "850297816 bytes to external destinations"
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:55:33+00:00",
+  "iteration": 45
+}

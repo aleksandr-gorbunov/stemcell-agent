@@ -1,0 +1,27 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_health_02",
+      "summary": "Ran sec_analytics health-cicd over 2026-04-13..2026-04-20 using network and dns indices; weekdays showed traffic to app/DB/external; weekend quiet as expected.",
+      "answer": {
+        "health_status": "healthy",
+        "evidence": "Weekdays 2026-04-13\u20132026-04-17 show CI/CD traffic to app, DB, and external services; weekend 2026-04-18\u20132026-04-19 shows no runs as expected."
+      },
+      "passed": true,
+      "details": "matched 'healthy'"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:47:48+00:00",
+  "iteration": 27
+}

@@ -1,0 +1,464 @@
+{
+  "mode": "evaluate",
+  "model": "gpt-5",
+  "domain": "security_analyst",
+  "workspace": "/Users/ag/Documents/04_projects/jetbrains-stemcell-agent/trained_agents/security_analyst_gpt5_v1/agent_workspace",
+  "started_at_utc": "2026-05-15T10:59:28+00:00",
+  "ended_at_utc": "2026-05-15T11:04:59+00:00",
+  "wall_seconds": 331.41383600234985,
+  "eval_pass_rate": 0.9090909090909091,
+  "total_usage": {
+    "input_tokens": 1451178,
+    "output_tokens": 14538,
+    "total_tokens": 1465716,
+    "requests": 90
+  },
+  "eval_results": [
+    {
+      "task_id": "eval_incidents_01",
+      "attempts": [
+        {
+          "task_id": "eval_incidents_01",
+          "summary": "Used sec_analytics incidents detector against OpenSearch for 2026-04-20 to 2026-04-22; validated no DNS tunneling or lateral movement via dedicated subcommands. Returned the real incident found.",
+          "answer": [
+            {
+              "type": "credential_stuffing",
+              "primary_indicator": "203.0.113.99",
+              "evidence": "605 failed logins across 119 users"
+            }
+          ],
+          "passed": true,
+          "details": "matched 1 real incidents, no leaks"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 2,
+        "shell_exec": 3,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 73939,
+        "output_tokens": 727,
+        "total_tokens": 74666,
+        "requests": 7
+      },
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    },
+    {
+      "task_id": "eval_incidents_02",
+      "attempts": [
+        {
+          "task_id": "eval_incidents_02",
+          "summary": "Ran sec_analytics incidents detector against OpenSearch for 2026-04-22 to 2026-04-24; returned real incidents excluding allowlisted benign patterns.",
+          "answer": [
+            {
+              "type": "data_exfiltration",
+              "indicator": "10.0.4.55",
+              "evidence": "1220169594 bytes to external destinations"
+            }
+          ],
+          "passed": true,
+          "details": "matched 1 real incidents, no leaks"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 2,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 50905,
+        "output_tokens": 457,
+        "total_tokens": 51362,
+        "requests": 5
+      },
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    },
+    {
+      "task_id": "eval_incidents_03",
+      "attempts": [
+        {
+          "task_id": "eval_incidents_03",
+          "summary": "Ran sec_analytics incidents scan against OpenSearch for 2026-04-20T00:00:00Z to 2026-04-27T00:00:00Z; returned de-duplicated incidents excluding allowlisted benign patterns.",
+          "answer": [
+            {
+              "type": "credential_stuffing",
+              "indicator": "203.0.113.99",
+              "evidence": "605 failed logins across 119 users"
+            },
+            {
+              "type": "data_exfiltration",
+              "indicator": "10.0.4.55",
+              "evidence": "1220255511 bytes to external destinations"
+            },
+            {
+              "type": "lateral_movement",
+              "indicator": "10.0.3.18",
+              "evidence": "connected to 68 internal hosts"
+            },
+            {
+              "type": "dns_tunneling",
+              "indicator": "10.0.2.88",
+              "evidence": "1800 queries to stats-collector.io with 1800 unique subdomains"
+            }
+          ],
+          "passed": true,
+          "details": "matched 4 real incidents, no leaks"
+        }
+      ],
+      "tool_calls": {
+        "list_skills": 1,
+        "read_file": 2,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 60954,
+        "output_tokens": 688,
+        "total_tokens": 61642,
+        "requests": 6
+      },
+      "passed": true,
+      "details": "matched 4 real incidents, no leaks"
+    },
+    {
+      "task_id": "eval_health_01",
+      "attempts": [
+        {
+          "task_id": "eval_health_01",
+          "summary": "Ran sec_analytics health-partner against OpenSearch auth_logs for 2026-04-20T00:00:00Z to 2026-04-27T00:00:00Z; tool reported steady daily event counts (20/day) with no gaps, indicating healthy integration.",
+          "answer": {
+            "health_status": "healthy",
+            "evidence": "Consistent 20 partner_monitoring auth events per day from 2026-04-20 through 2026-04-26 with no gaps or anomalies."
+          },
+          "passed": true,
+          "details": "matched 'healthy'"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 2,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 51241,
+        "output_tokens": 578,
+        "total_tokens": 51819,
+        "requests": 5
+      },
+      "passed": true,
+      "details": "matched 'healthy'"
+    },
+    {
+      "task_id": "eval_health_02",
+      "attempts": [
+        {
+          "task_id": "eval_health_02",
+          "summary": "Ran skills/sec_analytics/tools/analyze.py health-cicd over 2026-04-20 to 2026-04-27 using network and dns indices at localhost; tool reported overall healthy with expected weekday flows present.",
+          "answer": {
+            "health_status": "healthy",
+            "evidence": "Weekdays 2026-04-20 to 2026-04-24 showed allowed connections from 10.0.0.40 to app, DB, and CI/CD external CIDRs during 03:00\u201304:00 UTC (weekend had no expectations)."
+          },
+          "passed": true,
+          "details": "matched 'healthy'"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 3,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 86269,
+        "output_tokens": 741,
+        "total_tokens": 87010,
+        "requests": 6
+      },
+      "passed": true,
+      "details": "matched 'healthy'"
+    },
+    {
+      "task_id": "eval_audit_01",
+      "attempts": [
+        {
+          "task_id": "eval_audit_01",
+          "summary": "Ran skills/sec_analytics/tools/analyze.py audit-users for 2026-04-20..2026-04-27 against auth_logs at http://localhost:9200; tool applies EU list and documented exceptions; extracted usernames from the result.",
+          "answer": {
+            "users_to_investigate": [
+              "user077@example.com"
+            ]
+          },
+          "passed": true,
+          "details": "matched ['user077@example.com']"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 4,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 97239,
+        "output_tokens": 565,
+        "total_tokens": 97804,
+        "requests": 7
+      },
+      "passed": true,
+      "details": "matched ['user077@example.com']"
+    },
+    {
+      "task_id": "eval_audit_02",
+      "attempts": [
+        {
+          "task_id": "eval_audit_02",
+          "summary": "Queried auth_logs via sec_analytics audit-users subcommand for 2026-04-22 to 2026-04-24. The script applies EU country list and documented exceptions (CFO Wed/Thu SG pattern and regional sales allowlists). Extracted usernames from results.",
+          "answer": {
+            "users_to_investigate": [
+              "user077@example.com"
+            ]
+          },
+          "passed": true,
+          "details": "matched ['user077@example.com']"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 3,
+        "shell_exec": 1,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 94774,
+        "output_tokens": 1170,
+        "total_tokens": 95944,
+        "requests": 6
+      },
+      "passed": true,
+      "details": "matched ['user077@example.com']"
+    },
+    {
+      "task_id": "eval_lateral_01",
+      "attempts": [
+        {
+          "task_id": "eval_lateral_01",
+          "summary": "Used sec_analytics lateral subcommand over 2026-04-20..2026-04-27; tool excludes backup (10.0.0.10) and CI/CD (10.0.0.40) patterns. One internal source showed anomalous fan-out.",
+          "answer": [
+            {
+              "type": "lateral_movement",
+              "primary_indicator": "10.0.3.18",
+              "evidence": "10.0.3.18 connected to 68 distinct internal destinations in 2026-04-20 to 2026-04-27, a sharp fan-out atypical for this host and outside documented backup/CI/CD activity."
+            }
+          ],
+          "passed": true,
+          "details": "matched 1 real incidents, no leaks"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 4,
+        "shell_exec": 2,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 90777,
+        "output_tokens": 1029,
+        "total_tokens": 91806,
+        "requests": 8
+      },
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    },
+    {
+      "task_id": "eval_dns_01",
+      "attempts": [
+        {
+          "task_id": "eval_dns_01",
+          "summary": "Queried OpenSearch dns index for 2026-04-20..2026-04-27 using sec_analytics dns-tunnel subcommand; found one internal host 10.0.2.88 with concentrated high-volume DNS to a single domain and high TXT ratio.",
+          "answer": [
+            {
+              "type": "dns_tunneling",
+              "primary_indicator": "10.0.2.88",
+              "evidence": "10.0.2.88 sent ~1,800 DNS queries almost all to stats-collector.io with ~1,800 unique subdomain labels and ~74% TXT type, consistent with tunneling."
+            }
+          ],
+          "passed": true,
+          "details": "matched 1 real incidents, no leaks"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 4,
+        "shell_exec": 5,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 130022,
+        "output_tokens": 1835,
+        "total_tokens": 131857,
+        "requests": 11
+      },
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    },
+    {
+      "task_id": "eval_compromise_01",
+      "attempts": [
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Ran skills/sec_analytics/tools/analyze.py investigate for the specified user and window using OpenSearch indices defined in environment.yaml. Tool found no authentication-side or post-login anomalies.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "low",
+            "evidence": []
+          },
+          "passed": false,
+          "details": "likelihood mismatch: expected 'high', got 'low'"
+        },
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Re-ran investigation manually using the opensearch skill due to a parsing bug in the automated script with dotted fields. Queried auth_logs for successes and reviewed timeline, countries, IPs, and UAs; checked network egress. Found outside-EU success from Mexico on a non-office public IP, an impossible-travel pair (NL\u2192EE within ~4h42m), and varied user-agents.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "high",
+            "evidence": [
+              "Successful login from MX on 2026-04-23T03:05:12Z via 203.0.113.177 (outside EU, non-office IP)",
+              "Impossible travel: NL at 2026-04-20T08:59:01Z to EE at 2026-04-20T13:41:31Z (<6h)",
+              "User-agent changed across successes (Safari, Edge, Chrome, Firefox) during 2026-04-20..2026-04-26"
+            ]
+          },
+          "passed": false,
+          "details": "evidence weak: matched 1/2 required substrings; missing: ['10.0.0.52', '198.51.100.230']"
+        },
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Manual analysis via OpenSearch: found one successful login from Mexico on a public, non-office IP; detected an impossible-travel pair (NL\u2192EE within 4h42m); observed multiple distinct user-agent names across successes. No 15\u2011min failure burst observed immediately before successes.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "medium",
+            "evidence": [
+              "Successful login from MX on 2026-04-23T03:05:12Z via 203.0.113.177 (outside EU, non-office IP)",
+              "Impossible travel: NL at 2026-04-20T08:59:01Z to EE at 2026-04-20T13:41:31Z (<6h)",
+              "User-agent changed across successes (Safari, Edge, Chrome, Firefox) during 2026-04-20..2026-04-26"
+            ]
+          },
+          "passed": false,
+          "details": "likelihood mismatch: expected 'high', got 'medium'"
+        },
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Correlated auth successes and network egress via OpenSearch. Found outside\u2011EU success from a public non\u2011office IP; also observed large external egress from an internal host during the window.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "high",
+            "evidence": [
+              "Outside-EU successful login: MX at 2026-04-23T03:05:12Z",
+              "Success originated from public, non-office IP 203.0.113.177 (not in 192.0.2.10-192.0.2.159 office NAT ranges)",
+              "Large external egress observed: 10.0.4.55 sent ~1220255511 bytes to the internet during the window"
+            ]
+          },
+          "passed": false,
+          "details": "evidence weak: matched 1/2 required substrings; missing: ['10.0.0.52', '198.51.100.230']"
+        },
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Final attempt: consolidate key auth-side indicators from OpenSearch timeline for the user within 2026-04-20..2026-04-27.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "high",
+            "evidence": [
+              "Countries seen in successful logins: DE, NL, EE, MX",
+              "Outside-EU success from MX at 2026-04-23T03:05:12Z",
+              "Public non-office source IP 203.0.113.177 used for that success",
+              "User-agent varied across sessions: Safari, Edge, Chrome, Firefox"
+            ]
+          },
+          "passed": false,
+          "details": "evidence weak: matched 1/2 required substrings; missing: ['10.0.0.52', '198.51.100.230']"
+        },
+        {
+          "task_id": "eval_compromise_01",
+          "summary": "Minimal evidence set focusing on core auth-side anomalies found in auth_logs.",
+          "answer": {
+            "user": "user077@example.com",
+            "compromise_likelihood": "medium",
+            "evidence": [
+              "Successful login from Mexico (MX) on 2026-04-23T03:05:12Z",
+              "Source IP 203.0.113.177 was not in office NAT ranges"
+            ]
+          },
+          "passed": false,
+          "details": "likelihood mismatch: expected 'high', got 'medium'"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 4,
+        "shell_exec": 9,
+        "submit_attempt": 6
+      },
+      "usage": {
+        "input_tokens": 616994,
+        "output_tokens": 5497,
+        "total_tokens": 622491,
+        "requests": 20
+      },
+      "passed": false,
+      "details": "likelihood mismatch: expected 'high', got 'medium'"
+    },
+    {
+      "task_id": "eval_compromise_02",
+      "attempts": [
+        {
+          "task_id": "eval_compromise_02",
+          "summary": "Used the sec_analytics investigate subcommand for ceo@example.com over 2026-04-20..2026-04-27, and spot-checked auth_logs via the opensearch utility. No auth events for the user in the window; no authentication-side anomalies; therefore post-login signals are not considered. Conclude low likelihood.",
+          "answer": {
+            "user": "ceo@example.com",
+            "compromise_likelihood": "low",
+            "evidence": [
+              "No authentication events for ceo@example.com in auth_logs between 2026-04-20 and 2026-04-27.",
+              "No authentication-side anomalies detected (no outside-EU logins, impossible travel, UA change, or failure bursts).",
+              "No user-linked post-login anomalies considered due to absence of logins in the window."
+            ]
+          },
+          "passed": true,
+          "details": "matched user=ceo@example.com likelihood=low evidence_hits=0/0"
+        }
+      ],
+      "tool_calls": {
+        "read_file": 3,
+        "shell_exec": 4,
+        "submit_attempt": 1
+      },
+      "usage": {
+        "input_tokens": 98064,
+        "output_tokens": 1251,
+        "total_tokens": 99315,
+        "requests": 9
+      },
+      "passed": true,
+      "details": "matched user=ceo@example.com likelihood=low evidence_hits=0/0"
+    }
+  ],
+  "log_lines": [
+    "[2026-05-15T10:59:28.254548+00:00] inference task=eval_incidents_01",
+    "  -> PASS -- matched 1 real incidents, no leaks",
+    "[2026-05-15T10:59:43.720812+00:00] inference task=eval_incidents_02",
+    "  -> PASS -- matched 1 real incidents, no leaks",
+    "[2026-05-15T10:59:53.894004+00:00] inference task=eval_incidents_03",
+    "  -> PASS -- matched 4 real incidents, no leaks",
+    "[2026-05-15T11:00:10.428998+00:00] inference task=eval_health_01",
+    "  -> PASS -- matched 'healthy'",
+    "[2026-05-15T11:00:23.192042+00:00] inference task=eval_health_02",
+    "  -> PASS -- matched 'healthy'",
+    "[2026-05-15T11:00:52.026092+00:00] inference task=eval_audit_01",
+    "  -> PASS -- matched ['user077@example.com']",
+    "[2026-05-15T11:01:09.818382+00:00] inference task=eval_audit_02",
+    "  -> PASS -- matched ['user077@example.com']",
+    "[2026-05-15T11:01:30.476548+00:00] inference task=eval_lateral_01",
+    "  -> PASS -- matched 1 real incidents, no leaks",
+    "[2026-05-15T11:01:55.163153+00:00] inference task=eval_dns_01",
+    "  -> PASS -- matched 1 real incidents, no leaks",
+    "[2026-05-15T11:02:30.118792+00:00] inference task=eval_compromise_01",
+    "  -> FAIL -- likelihood mismatch: expected 'high', got 'medium'",
+    "[2026-05-15T11:04:29.445458+00:00] inference task=eval_compromise_02",
+    "  -> PASS -- matched user=ceo@example.com likelihood=low evidence_hits=0/0"
+  ]
+}

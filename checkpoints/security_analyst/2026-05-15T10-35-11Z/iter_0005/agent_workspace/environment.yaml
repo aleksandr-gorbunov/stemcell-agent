@@ -1,0 +1,55 @@
+opensearch:
+  base_url: http://localhost:9200
+indices:
+  auth: auth_logs
+  network: network
+  dns: dns
+eu_countries:
+  - AT
+  - BE
+  - BG
+  - HR
+  - CY
+  - CZ
+  - DK
+  - EE
+  - FI
+  - FR
+  - DE
+  - GR
+  - HU
+  - IE
+  - IT
+  - LV
+  - LT
+  - LU
+  - MT
+  - NL
+  - PL
+  - PT
+  - RO
+  - SK
+  - SI
+  - ES
+  - SE
+  - IS
+  - NO
+  - LI
+  - CH
+allowlists:
+  partner_monitoring_range: 198.51.100.10-198.51.100.20
+  pen_test_ip: 198.51.100.50
+  ci_cd_external_cidrs:
+    - 18.213.0.0/16
+    - 140.82.112.0/20
+  offices_nat_ranges:
+    - 192.0.2.10-192.0.2.59   # Berlin
+    - 192.0.2.80-192.0.2.109 # Amsterdam
+    - 192.0.2.140-192.0.2.159 # Tallinn
+internal:
+  cidr: 10.0.0.0/16
+  backup_host: 10.0.0.10
+  cicd_host: 10.0.0.40
+  app_range: 10.0.0.60-10.0.0.62
+  db_range: 10.0.0.50-10.0.0.54
+  resolver: 10.0.0.5

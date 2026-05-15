@@ -176,4 +176,4 @@ The OpenSearch data is fixed and committed under `test_setup/security_analyst/da
 
 ---
 
-Code in this repository was developed with the assistance of Claude (Anthropic).
+The architecture, design decisions, experiments, and ideas in this repository are the author's. Claude (Anthropic) was used to assist coding and text editing.

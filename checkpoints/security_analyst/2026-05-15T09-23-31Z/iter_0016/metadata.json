@@ -1,0 +1,15 @@
+{
+  "phase": "STOP",
+  "decision": "architectural_failure",
+  "reason": "no measurable improvement over last 10 iters at pass_rate=0.09",
+  "tracker": {
+    "total": 11,
+    "passed": 1,
+    "failed": 4,
+    "unattempted": 6,
+    "attempted_at_least_once": 5,
+    "pass_rate": 0.09090909090909091
+  },
+  "timestamp": "2026-05-15T09:40:58+00:00",
+  "iteration": 16
+}

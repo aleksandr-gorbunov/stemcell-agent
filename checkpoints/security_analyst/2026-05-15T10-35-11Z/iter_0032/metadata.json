@@ -1,0 +1,45 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_incidents_03",
+      "summary": "Ran sec_analytics incidents detector for 2026-04-13 to 2026-04-20, which excludes documented benign patterns (incl. Sunday pen test). Returning the incident list it found.",
+      "answer": [
+        {
+          "type": "credential_stuffing",
+          "indicator": "203.0.113.42",
+          "evidence": "520 failed logins across 118 users"
+        },
+        {
+          "type": "data_exfiltration",
+          "indicator": "10.0.4.22",
+          "evidence": "850330529 bytes to external destinations"
+        },
+        {
+          "type": "lateral_movement",
+          "indicator": "10.0.3.30",
+          "evidence": "connected to 68 internal hosts"
+        },
+        {
+          "type": "dns_tunneling",
+          "indicator": "10.0.2.45",
+          "evidence": "1500 queries to data-corp.io with 1500 unique subdomains"
+        }
+      ],
+      "passed": true,
+      "details": "matched 4 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:49:21+00:00",
+  "iteration": 32
+}

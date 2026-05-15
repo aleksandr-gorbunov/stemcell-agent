@@ -1,0 +1,92 @@
+{
+  "tasks": [
+    {
+      "task_id": "train_incidents_01",
+      "capability": "detect_security_incidents",
+      "instruction": "Review security activity between 2026-04-13T00:00:00Z and\n2026-04-15T00:00:00Z (Monday through Tuesday). Identify real security\nincidents present in that window across the auth_logs, network, and dns\n\u2026",
+      "attempts": 5,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_incidents_02",
+      "capability": "detect_security_incidents",
+      "instruction": "Review security activity between 2026-04-15T00:00:00Z and\n2026-04-17T00:00:00Z (Wednesday through Thursday). Identify real\nsecurity incidents present in that window across auth_logs, network,\nand dns.\u2026",
+      "attempts": 4,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_incidents_03",
+      "capability": "detect_security_incidents",
+      "instruction": "Review security activity for the full week 2026-04-13T00:00:00Z through\n2026-04-20T00:00:00Z (Monday through Sunday). Identify real security\nincidents present in that window across auth_logs, network,\u2026",
+      "attempts": 3,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_health_01",
+      "capability": "assess_service_health",
+      "instruction": "Assess the health of the `partner_monitoring` integration over the full\nweek 2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z.\n\nUse the auth_logs index at http://localhost:9200.\n\nReturn your answer a\u2026",
+      "attempts": 1,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_health_02",
+      "capability": "assess_service_health",
+      "instruction": "Assess the health of the `ci_cd_pipeline` integration over the full\nweek 2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z.\n\nUse the network and dns indices at http://localhost:9200.\n\nReturn your answ\u2026",
+      "attempts": 9,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_audit_01",
+      "capability": "audit_user_access",
+      "instruction": "Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z (the full week),\nlist any users who successfully logged in from outside the EU and\nwhose activity warrants investigation. Exclude users whose non-\u2026",
+      "attempts": 5,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_audit_02",
+      "capability": "audit_user_access",
+      "instruction": "Between 2026-04-15T00:00:00Z and 2026-04-17T00:00:00Z (Wednesday through\nThursday only), list any users who successfully logged in from outside\nthe EU and whose activity warrants investigation. Exclud\u2026",
+      "attempts": 4,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_lateral_01",
+      "capability": "detect_lateral_movement",
+      "instruction": "Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z, identify any\ninternal hosts whose connection pattern in the network index shows\nunusual fan-out to internal destinations they do not normally tou\u2026",
+      "attempts": 3,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_dns_01",
+      "capability": "detect_dns_tunneling",
+      "instruction": "Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z, identify any\ninternal hosts whose DNS query pattern indicates tunneling (high volume\nto a single domain with random-looking subdomain labels).\n\nU\u2026",
+      "attempts": 7,
+      "status": "passed",
+      "last_failure": null
+    },
+    {
+      "task_id": "train_compromise_01",
+      "capability": "investigate_compromised_account",
+      "instruction": "Investigate `user042@example.com` for signs of compromise during\n2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,\nnetwork, and dns indices at http://localhost:9200.\n\nReturn a JSON\u2026",
+      "attempts": 2,
+      "status": "failed",
+      "last_failure": "likelihood mismatch: expected 'high', got 'low'"
+    },
+    {
+      "task_id": "train_compromise_02",
+      "capability": "investigate_compromised_account",
+      "instruction": "Investigate `cto@example.com` for signs of compromise during\n2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,\nnetwork, and dns indices at http://localhost:9200.\n\nReturn a JSON obj\u2026",
+      "attempts": 3,
+      "status": "passed",
+      "last_failure": null
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "unattempted": 0,
+    "attempted_at_least_once": 11,
+    "pass_rate": 0.9090909090909091
+  },
+  "attempts": [
+    {
+      "task_id": "train_lateral_01",
+      "summary": "Ran sec_analytics lateral movement detector over network index for 2026-04-13..2026-04-20; tool excludes backup/CI/CD windows and returned one anomalous source with high internal fan-out.",
+      "answer": [
+        {
+          "type": "lateral_movement",
+          "primary_indicator": "10.0.3.30",
+          "evidence": "10.0.3.30 showed unusual internal fan-out (68 distinct internal destinations) during 2026-04-13 to 2026-04-20 outside documented backup/CI/CD windows."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:56:36+00:00",
+  "iteration": 50
+}

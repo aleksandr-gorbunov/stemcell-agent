@@ -1,0 +1,30 @@
+{
+  "phase_during_iter": "self_testing",
+  "next_phase": "self_testing",
+  "tracker": {
+    "total": 11,
+    "passed": 5,
+    "failed": 0,
+    "unattempted": 6,
+    "attempted_at_least_once": 5,
+    "pass_rate": 0.45454545454545453
+  },
+  "attempts": [
+    {
+      "task_id": "train_lateral_01",
+      "summary": "Ran sec_analytics lateral detector against OpenSearch for 2026-04-13..2026-04-20; transformed result into required schema.",
+      "answer": [
+        {
+          "type": "lateral_movement",
+          "primary_indicator": "10.0.3.30",
+          "evidence": "Unusual fan-out: connected to 68 internal hosts it does not normally access during the window."
+        }
+      ],
+      "passed": true,
+      "details": "matched 1 real incidents, no leaks"
+    }
+  ],
+  "forcing_message_for_next": null,
+  "timestamp": "2026-05-15T10:39:35+00:00",
+  "iteration": 9
+}

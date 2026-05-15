@@ -173,7 +173,7 @@
   instruction: |
     Investigate `user042@example.com` for signs of compromise during
     2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,
-    network, and dns indices.
+    network, and dns indices at http://localhost:9200.
 
     Return a JSON object via submit_attempt's `answer` field:
 
@@ -194,7 +194,7 @@
   instruction: |
     Investigate `cto@example.com` for signs of compromise during
     2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,
-    network, and dns indices.
+    network, and dns indices at http://localhost:9200.
 
     Return a JSON object via submit_attempt's `answer` field:
 
