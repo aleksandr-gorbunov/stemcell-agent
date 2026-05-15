@@ -162,6 +162,50 @@ Find internal hosts with high outbound volume to external destinations:
 }
 ```
 
+Find internal hosts whose set of internal destinations is unusually broad:
+
+```
+{
+  "size": 0,
+  "query": {
+    "bool": {"filter": [
+      {"range": {"@timestamp": {"gte": "...", "lt": "..."}}},
+      {"prefix": {"source.ip": "10."}},
+      {"prefix": {"destination.ip": "10."}}
+    ]}
+  },
+  "aggs": {
+    "by_source": {
+      "terms": {"field": "source.ip", "size": 20},
+      "aggs": {"unique_dests": {"cardinality": {"field": "destination.ip"}}}
+    }
+  }
+}
+```
+
+Find DNS query volume per source IP, optionally restricted to a single domain:
+
+```
+{
+  "size": 0,
+  "query": {"bool": {"filter": [
+    {"range": {"@timestamp": {"gte": "...", "lt": "..."}}},
+    {"wildcard": {"query.name": "*.tunnel.example.org"}}
+  ]}},
+  "aggs": {
+    "by_source": {
+      "terms": {"field": "source.ip", "size": 20},
+      "aggs": {"unique_names": {"cardinality": {"field": "query.name"}}}
+    }
+  }
+}
+```
+
+A high ratio of unique query names to total queries from one source, paired
+with high absolute volume, is a strong tunneling signal. Document length and
+character entropy of subdomain labels are also useful when computed on the
+client side from the returned hits.
+
 ## Calling from a script
 
 A minimal request with the http_request base tool:

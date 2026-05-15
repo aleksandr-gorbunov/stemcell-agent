@@ -76,7 +76,6 @@ def verify_incidents(*, task, attempt, environment_context):
 def verify_enum(*, task, attempt, environment_context):
     expected_value = _lookup(task)["value"]
     actual = attempt.get("answer")
-    # Accept either a bare string or a dict with one of a few conventional keys.
     if isinstance(actual, str):
         actual_value = actual
     elif isinstance(actual, dict):
@@ -115,3 +114,43 @@ def verify_user_set(*, task, attempt, environment_context):
     if extra:
         parts.append(f"extra: {sorted(extra)}")
     return False, "; ".join(parts)
+
+
+def verify_compromise(*, task, attempt, environment_context):
+    expected = _lookup(task)
+    actual = attempt.get("answer")
+    if not isinstance(actual, dict):
+        return False, f"answer must be a JSON object, got {type(actual).__name__}"
+
+    exp_user = expected["user"].strip().lower()
+    got_user = _str(actual.get("user", "")).strip().lower()
+    if got_user != exp_user:
+        return False, f"user mismatch: expected {exp_user!r}, got {got_user!r}"
+
+    exp_likelihood = expected["likelihood"].strip().lower()
+    got_likelihood = _str(actual.get("compromise_likelihood", "")).strip().lower()
+    if got_likelihood != exp_likelihood:
+        return False, f"likelihood mismatch: expected {exp_likelihood!r}, got {got_likelihood!r}"
+
+    evidence_field = actual.get("evidence", [])
+    if isinstance(evidence_field, str):
+        evidence_text = evidence_field
+    elif isinstance(evidence_field, list):
+        evidence_text = " || ".join(_str(e) for e in evidence_field)
+    else:
+        evidence_text = _str(evidence_field)
+    evidence_lc = evidence_text.lower()
+
+    required = expected.get("required_evidence_substrings", [])
+    threshold = expected.get("required_evidence_min", len(required))
+    found = [s for s in required if s.lower() in evidence_lc]
+    if len(found) < threshold:
+        missing = [s for s in required if s not in found]
+        return False, f"evidence weak: matched {len(found)}/{threshold} required substrings; missing: {missing}"
+
+    forbidden = expected.get("forbidden_evidence_substrings", [])
+    leaked = [s for s in forbidden if s.lower() in evidence_lc]
+    if leaked:
+        return False, f"evidence references documented-benign indicators: {leaked}"
+
+    return True, f"matched user={exp_user} likelihood={exp_likelihood} evidence_hits={len(found)}/{threshold}"

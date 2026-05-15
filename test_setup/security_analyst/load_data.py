@@ -9,7 +9,7 @@ import urllib.error
 from pathlib import Path
 
 DEFAULT_HOST = "http://localhost:9200"
-INDICES = ("auth_logs", "network")
+INDICES = ("auth_logs", "network", "dns")
 DATA_ROOT = Path(__file__).resolve().parent / "data"
 
 INDEX_MAPPINGS = {
@@ -60,6 +60,21 @@ INDEX_MAPPINGS = {
                         "dataset": {"type": "keyword"},
                     }
                 },
+            }
+        }
+    },
+    "dns": {
+        "mappings": {
+            "properties": {
+                "@timestamp": {"type": "date"},
+                "source": {"properties": {"ip": {"type": "keyword"}}},
+                "query": {
+                    "properties": {
+                        "name": {"type": "keyword"},
+                        "type": {"type": "keyword"},
+                    }
+                },
+                "response": {"properties": {"code": {"type": "keyword"}}},
             }
         }
     },

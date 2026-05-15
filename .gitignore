@@ -23,3 +23,5 @@ HANDOVER.md
 check_install.py
 
 test_setup/security_analyst/generate_data.py
+
+archive/

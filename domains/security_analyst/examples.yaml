@@ -1,70 +1,90 @@
-# Training examples. Each row is one concrete instance of a capability from
-# DESCRIPTION.md. Expected answers live in evals/security_analyst/answers.yaml.
-
 - id: train_incidents_01
   capability: detect_security_incidents
   instruction: |
-    Review security activity in the auth_logs and network indices between
-    2026-04-13T00:00:00Z and 2026-04-16T00:00:00Z (Monday through Wednesday).
-    Identify real security incidents present in that window. Do not flag
-    activity that matches a documented benign pattern.
+    Review security activity between 2026-04-13T00:00:00Z and
+    2026-04-15T00:00:00Z (Monday through Tuesday). Identify real security
+    incidents present in that window across the auth_logs, network, and dns
+    indices. Do not flag activity that matches a documented benign pattern.
 
-    OpenSearch is at http://localhost:9200. Indices: auth_logs, network.
+    OpenSearch is at http://localhost:9200. Indices: auth_logs, network, dns.
 
     Return your answer as a JSON list via submit_attempt's `answer` field.
-    Each item must be an object:
+    Each item:
 
       {
-        "type": "<one of: credential_stuffing | data_exfiltration | lateral_movement | dns_tunneling | other>",
-        "primary_indicator": "<IP address, user name, or internal hostname>",
+        "type": "<credential_stuffing|data_exfiltration|lateral_movement|dns_tunneling|compromised_account|other>",
+        "primary_indicator": "<IP, user, or internal hostname>",
         "evidence": "<one-sentence reason>"
       }
 
-    The `type` value must come from the enumerated set above. If no real
-    incidents are present in the window, submit an empty list.
+    Submit an empty list if no real incidents are present.
   verification:
     function: verify_incidents
 
 - id: train_incidents_02
   capability: detect_security_incidents
   instruction: |
-    Review security activity in the auth_logs and network indices between
-    2026-04-16T00:00:00Z and 2026-04-19T00:00:00Z (Thursday through Saturday).
-    Identify real security incidents present in that window. Do not flag
-    activity that matches a documented benign pattern.
+    Review security activity between 2026-04-15T00:00:00Z and
+    2026-04-17T00:00:00Z (Wednesday through Thursday). Identify real
+    security incidents present in that window across auth_logs, network,
+    and dns. Do not flag documented benign activity.
 
-    OpenSearch is at http://localhost:9200. Indices: auth_logs, network.
+    OpenSearch is at http://localhost:9200. Indices: auth_logs, network, dns.
 
-    Return your answer as a JSON list via submit_attempt's `answer` field.
-    Each item must be an object:
+    Return a JSON list of incidents via submit_attempt's `answer` field,
+    using the same item shape as the other detect_security_incidents tasks.
+    Empty list if nothing real is happening.
+  verification:
+    function: verify_incidents
 
-      {
-        "type": "<one of: credential_stuffing | data_exfiltration | lateral_movement | dns_tunneling | other>",
-        "primary_indicator": "<IP address, user name, or internal hostname>",
-        "evidence": "<one-sentence reason>"
-      }
+- id: train_incidents_03
+  capability: detect_security_incidents
+  instruction: |
+    Review security activity for the full week 2026-04-13T00:00:00Z through
+    2026-04-20T00:00:00Z (Monday through Sunday). Identify real security
+    incidents present in that window across auth_logs, network, and dns.
+    Do not flag activity that matches a documented benign pattern. Note
+    that documented patterns covering Sunday include the authorized pen
+    test.
 
-    The `type` value must come from the enumerated set above. If no real
-    incidents are present in the window, submit an empty list.
+    OpenSearch is at http://localhost:9200. Indices: auth_logs, network, dns.
+
+    Return a JSON list of incidents via submit_attempt's `answer` field,
+    using the same item shape as the other detect_security_incidents tasks.
   verification:
     function: verify_incidents
 
 - id: train_health_01
   capability: assess_service_health
   instruction: |
-    Assess the health of the PartnerAcme monitoring integration between
-    2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z (the full week).
+    Assess the health of the `partner_monitoring` integration over the full
+    week 2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z.
 
-    Use the auth_logs and network indices at http://localhost:9200.
+    Use the auth_logs index at http://localhost:9200.
 
     Return your answer as a JSON object via submit_attempt's `answer` field:
 
       {
-        "health_status": "<one of: healthy | degraded | unreachable>",
+        "health_status": "<healthy|degraded|unreachable>",
         "evidence": "<one-sentence reason>"
       }
+  verification:
+    function: verify_enum
 
-    `health_status` must come from the enumerated set above.
+- id: train_health_02
+  capability: assess_service_health
+  instruction: |
+    Assess the health of the `ci_cd_pipeline` integration over the full
+    week 2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z.
+
+    Use the network and dns indices at http://localhost:9200.
+
+    Return your answer as a JSON object via submit_attempt's `answer` field:
+
+      {
+        "health_status": "<healthy|degraded|unreachable>",
+        "evidence": "<one-sentence reason>"
+      }
   verification:
     function: verify_enum
 
@@ -72,18 +92,116 @@
   capability: audit_user_access
   instruction: |
     Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z (the full week),
-    list any users who successfully logged in from outside the EU and whose
-    activity warrants further investigation. Exclude users whose non-EU
+    list any users who successfully logged in from outside the EU and
+    whose activity warrants investigation. Exclude users whose non-EU
     activity is covered by a documented exception.
 
     Use the auth_logs index at http://localhost:9200.
 
     Return your answer as a JSON object via submit_attempt's `answer` field:
 
-      {
-        "users_to_investigate": ["<user.name>", "<user.name>", ...]
-      }
+      {"users_to_investigate": ["<user.name>", ...]}
 
-    If no such users exist, submit an empty list.
+    Empty list if no such users exist.
   verification:
     function: verify_user_set
+
+- id: train_audit_02
+  capability: audit_user_access
+  instruction: |
+    Between 2026-04-15T00:00:00Z and 2026-04-17T00:00:00Z (Wednesday through
+    Thursday only), list any users who successfully logged in from outside
+    the EU and whose activity warrants investigation. Exclude users whose
+    non-EU activity for this period is covered by a documented exception.
+
+    Use the auth_logs index at http://localhost:9200.
+
+    Return your answer as a JSON object via submit_attempt's `answer` field:
+
+      {"users_to_investigate": ["<user.name>", ...]}
+
+    Empty list if no such users exist.
+  verification:
+    function: verify_user_set
+
+- id: train_lateral_01
+  capability: detect_lateral_movement
+  instruction: |
+    Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z, identify any
+    internal hosts whose connection pattern in the network index shows
+    unusual fan-out to internal destinations they do not normally touch.
+    Exclude documented infrastructure activity (scheduled backup, CI/CD
+    nightly window).
+
+    Use the network index at http://localhost:9200.
+
+    Return a JSON list via submit_attempt's `answer` field. Each item:
+
+      {
+        "type": "lateral_movement",
+        "primary_indicator": "<source internal hostname>",
+        "evidence": "<one-sentence reason>"
+      }
+
+    Empty list if no lateral movement is observed.
+  verification:
+    function: verify_incidents
+
+- id: train_dns_01
+  capability: detect_dns_tunneling
+  instruction: |
+    Between 2026-04-13T00:00:00Z and 2026-04-20T00:00:00Z, identify any
+    internal hosts whose DNS query pattern indicates tunneling (high volume
+    to a single domain with random-looking subdomain labels).
+
+    Use the dns index at http://localhost:9200.
+
+    Return a JSON list via submit_attempt's `answer` field. Each item:
+
+      {
+        "type": "dns_tunneling",
+        "primary_indicator": "<source internal hostname>",
+        "evidence": "<one-sentence reason>"
+      }
+
+    Empty list if no tunneling is observed.
+  verification:
+    function: verify_incidents
+
+- id: train_compromise_01
+  capability: investigate_compromised_account
+  instruction: |
+    Investigate `user042@example.com` for signs of compromise during
+    2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,
+    network, and dns indices.
+
+    Return a JSON object via submit_attempt's `answer` field:
+
+      {
+        "user": "user042@example.com",
+        "compromise_likelihood": "<low|medium|high>",
+        "evidence": ["<short statement>", "<short statement>", ...]
+      }
+
+    The evidence list should contain short factual statements drawn from
+    the logs (unusual login geographies, hosts accessed outside the user's
+    typical pattern, anomalous data movement, etc.).
+  verification:
+    function: verify_compromise
+
+- id: train_compromise_02
+  capability: investigate_compromised_account
+  instruction: |
+    Investigate `cto@example.com` for signs of compromise during
+    2026-04-13T00:00:00Z through 2026-04-20T00:00:00Z. Use the auth_logs,
+    network, and dns indices.
+
+    Return a JSON object via submit_attempt's `answer` field:
+
+      {
+        "user": "cto@example.com",
+        "compromise_likelihood": "<low|medium|high>",
+        "evidence": ["<short statement>", "<short statement>", ...]
+      }
+  verification:
+    function: verify_compromise
