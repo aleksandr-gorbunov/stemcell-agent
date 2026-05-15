@@ -1,0 +1,18 @@
+# Each row is one task instance attempted in SELF_TESTING. Held-out eval
+# instances live under evals/<domain_name>/examples.yaml.
+
+- id: <task_id_1>
+  capability: <capability_id_1>
+  instruction: |
+    What the agent is asked to do for this one instance. Be explicit about
+    the answer format expected.
+  verification:
+    function: <verifier_function_name>
+
+- id: <task_id_2>
+  capability: <capability_id_2>
+  instruction: |
+    Another instance, exercising a different capability. The instruction
+    template can be reused across instances by varying the parameter values.
+  verification:
+    function: <verifier_function_name>
