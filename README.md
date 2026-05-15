@@ -60,20 +60,27 @@ python -m stem reject --reason "missed the filter cases"
 python -m stem train --domain domains/<name> --resume
 ```
 
-Run the naive baseline for comparison (same agent code, empty workspace,
-writes disabled, base tools only):
+Run the untrained baseline for comparison. `trained_agents/vanilla/` is a committed empty stem agent; loading it routes through the same evaluation path as a trained agent, but the path policy refuses domain-dir reads so the baseline cannot consult `DESCRIPTION.md`:
 
 ```bash
-python -m stem baseline --domain domains/<name>
+python -m stem evaluate --load trained_agents/vanilla --domain domains/<name>
 ```
 
-Load and evaluate a previously saved trained agent:
+Load and evaluate a previously trained agent:
 
 ```bash
-python -m stem inference --load trained_agents/my_agent_v1
+python -m stem evaluate --load trained_agents/my_agent_v1 --domain domains/<name>
 ```
 
-Useful flags on `train` and `baseline`:
+Run a trained agent on an ad-hoc instruction (no examples, no scoring; the agent answers a single user request and ends):
+
+```bash
+python -m stem inference --load trained_agents/my_agent_v1 \
+  --domain domains/<name> \
+  --instruction "summarize anomalous activity in the last 24 hours"
+```
+
+Useful flags on `train` and `evaluate`:
 
 - `--model gpt-5.5`: override the main agent model (also settable via `STEMCELL_MODEL`)
 - `--max-iterations 50`: cap on the SELF_MOD ⇄ SELF_TEST loop
@@ -153,10 +160,10 @@ python test_setup/security_analyst/load_data.py --mode eval
 python -m stem evaluate --domain domains/security_analyst
 ```
 
-To compare against the naive baseline (same eval data, empty workspace, no domain knowledge):
+To compare against the untrained baseline (same eval data, empty workspace, no domain knowledge):
 
 ```bash
-python -m stem baseline --domain domains/security_analyst
+python -m stem evaluate --load trained_agents/vanilla --domain domains/security_analyst
 ```
 
 Tear down when done:
@@ -165,7 +172,7 @@ Tear down when done:
 docker compose -f test_setup/security_analyst/docker-compose.yaml down -v
 ```
 
-The OpenSearch data is fixed and committed under `test_setup/security_analyst/data/`. The generator that produced it is gitignored: reproducing results requires running `load_data.py` against the committed NDJSON files, not regenerating from scratch.
+The OpenSearch data is fixed and committed under `test_setup/security_analyst/data/`. Reproducing results means running `load_data.py` against those committed NDJSON files.
 
 ---
 

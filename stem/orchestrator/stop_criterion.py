@@ -49,7 +49,7 @@ def evaluate(
 ) -> Decision:
     """Decide whether the orchestrator should keep running the agent.
 
-    Note: success exit is NOT decided here — that comes from the agent calling
+    Note: success exit is NOT decided here; that comes from the agent calling
     declare_ready_for_inference, which the runner handles directly.
     """
     if state.iterations_run >= cfg.budget_max_iterations:

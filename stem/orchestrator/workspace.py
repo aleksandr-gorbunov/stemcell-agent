@@ -14,7 +14,7 @@ Fixed layout under agent_workspace/:
 
 Filename convention: markdown documents are ALL_CAPS (README-style); Python
 and YAML file basenames are lowercase. Directory names are lowercase. The
-path conventions here are hardcoded — the agent and authored scripts should
+path conventions here are hardcoded; the agent and authored scripts should
 rely on these exact names.
 """
 from __future__ import annotations
@@ -133,7 +133,7 @@ def summarize_workspace(layout: WorkspaceLayout) -> str:
                 except Exception:
                     pass
             tools_summary = f"{py_count} script{'s' if py_count != 1 else ''}" if py_count else "no scripts"
-            lines.append(f"  - {sd.name}/ ({tools_summary}){' — ' + first_line if first_line else ''}")
+            lines.append(f"  - {sd.name}/ ({tools_summary}){': ' + first_line if first_line else ''}")
     else:
         lines.append("skills/ (no skills yet)")
 

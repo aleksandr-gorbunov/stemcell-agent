@@ -12,13 +12,14 @@ checkpoints/*
 !checkpoints/.gitkeep
 trained_agents/*
 !trained_agents/.gitkeep
-domains/example/*
-!domains/example/.gitkeep
+!trained_agents/vanilla/
 results/
 _check_workspace/
 
-# Private working docs (not part of the submission)
 DESIGN.md
 BUILD_LOG.md
 TODO.md
+HANDOVER.md
 check_install.py
+
+test_setup/security_analyst/generate_data.py

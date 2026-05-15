@@ -11,10 +11,12 @@ import json
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 from agents import FunctionTool
+
+VerifyFn = Callable[[str, dict], "tuple[bool, str]"]
 
 
 class Phase(str, Enum):
@@ -85,15 +87,29 @@ class PathPolicy:
 # ---------------------------------------------------------------------------
 
 class IterationState:
-    """Mutable state populated by tools during one Runner.run() invocation."""
+    """Mutable state populated by tools during one Runner.run() invocation.
+
+    Tool-call counts and the ordered trace are NOT tracked here; the SDK
+    already records them in `RunResult.new_items`. The orchestrator extracts
+    that information from the result after the run completes.
+    """
 
     def __init__(self):
         self.attempts: list[dict] = []
         self.halt_reason: str | None = None
         self.requested_phase: Phase | None = None
 
-    def record_attempt(self, *, task_id: str, summary: str, answer: Any) -> None:
-        self.attempts.append({"task_id": task_id, "summary": summary, "answer": answer})
+    def record_attempt(
+        self, *, task_id: str, summary: str, answer: Any,
+        passed: bool | None = None, details: str = "",
+    ) -> None:
+        self.attempts.append({
+            "task_id": task_id,
+            "summary": summary,
+            "answer": answer,
+            "passed": passed,
+            "details": details,
+        })
 
     def halt(self, reason: str) -> None:
         self.halt_reason = reason
@@ -263,8 +279,8 @@ def make_http_tools() -> list[FunctionTool]:
                         kwargs["content"] = body
                 r = await client.request(method, url, **kwargs)
                 text = r.text
-                if len(text) > 200_000:
-                    text = text[:200_000] + "\n\n[truncated]"
+                if len(text) > 30_000:
+                    text = text[:30_000] + "\n\n[truncated to keep context manageable; rerun with a more targeted query or aggregation if you need more]"
                 return json.dumps({
                     "status": r.status_code,
                     "headers": dict(r.headers),
@@ -289,6 +305,7 @@ def make_http_tools() -> list[FunctionTool]:
                 "additionalProperties": False,
             },
             on_invoke_tool=_http_request,
+            strict_json_schema=False,
         ),
     ]
 
@@ -303,13 +320,7 @@ def make_web_search_tool() -> FunctionTool | None:
 
 
 def make_list_skills_tool(workspace_root: Path) -> FunctionTool:
-    """Base tool: list the skills currently in the agent's workspace.
-
-    Returns one entry per skill directory under `agent_workspace/skills/` with
-    its name, one-line description (first non-comment line of SKILL.md if
-    present), and Python-tool count. Always fresh — useful for re-checking
-    after writing a new skill mid-iteration.
-    """
+    """List skills currently in the agent's workspace, with name, one-line description, and script count."""
     async def _list(ctx, params_json: str) -> str:
         from stem.orchestrator.workspace import SKILLS_DIR, SKILL_DOC_FILE, SKILL_TOOLS_DIR
         skills_dir = workspace_root / SKILLS_DIR
@@ -355,32 +366,39 @@ def make_list_skills_tool(workspace_root: Path) -> FunctionTool:
 # Phase-restricted tools: submit_attempt and the three transition tools
 # ---------------------------------------------------------------------------
 
-def make_submit_attempt_tool(state: IterationState, phase: Phase) -> FunctionTool | None:
+def make_submit_attempt_tool(
+    state: IterationState, phase: Phase, verify_fn: VerifyFn | None = None,
+) -> FunctionTool | None:
     if phase not in ATTEMPT_PHASES:
         return None
 
     async def _submit(ctx, params_json: str) -> str:
         params = json.loads(params_json)
+        task_id = params["task_id"]
+        answer = params.get("answer")
+        attempt_dict = {"task_id": task_id, "summary": params.get("summary", ""), "answer": answer}
+
+        passed: bool | None = None
+        details = ""
+        if verify_fn is not None:
+            passed, details = verify_fn(task_id, attempt_dict)
+
         state.record_attempt(
-            task_id=params["task_id"],
+            task_id=task_id,
             summary=params.get("summary", ""),
-            answer=params.get("answer"),
+            answer=answer,
+            passed=passed,
+            details=details,
         )
-        return json.dumps({
-            "received": True,
-            "task_id": params["task_id"],
-            "note": (
-                "Your attempt was recorded. Verification will be applied after this iteration completes. "
-                "If you have more to do this turn (revisit your knowledge, transition phase, attempt another "
-                "task), continue. Otherwise finish your turn."
-            ),
-        })
+        return json.dumps({"task_id": task_id, "passed": passed})
 
     return FunctionTool(
         name="submit_attempt",
         description=(
             "Commit your attempt on a task. Provide the task_id, a short summary of what you did, and "
-            "your final answer (as a JSON-compatible value if the task expects one)."
+            "your final answer (as a JSON-compatible value if the task expects one). Returns "
+            "`{passed: true|false}` synchronously: you learn whether the answer was correct in the "
+            "same turn, without leaving the iteration."
         ),
         params_json_schema={
             "type": "object",
@@ -393,6 +411,7 @@ def make_submit_attempt_tool(state: IterationState, phase: Phase) -> FunctionToo
             "additionalProperties": False,
         },
         on_invoke_tool=_submit,
+        strict_json_schema=False,
     )
 
 
@@ -476,7 +495,9 @@ def make_transition_tools(state: IterationState, phase: Phase) -> list[FunctionT
 # Aggregate
 # ---------------------------------------------------------------------------
 
-def build_base_tools(policy: PathPolicy, iter_state: IterationState) -> list[FunctionTool]:
+def build_base_tools(
+    policy: PathPolicy, iter_state: IterationState, verify_fn: VerifyFn | None = None,
+) -> list[FunctionTool]:
     tools: list[FunctionTool] = []
     tools.extend(make_file_tools(policy))
     tools.append(make_list_skills_tool(policy.workspace))
@@ -485,7 +506,7 @@ def build_base_tools(policy: PathPolicy, iter_state: IterationState) -> list[Fun
     web = make_web_search_tool()
     if web is not None:
         tools.append(web)
-    submit = make_submit_attempt_tool(iter_state, policy.phase)
+    submit = make_submit_attempt_tool(iter_state, policy.phase, verify_fn=verify_fn)
     if submit is not None:
         tools.append(submit)
     tools.append(make_halt_tool(iter_state))

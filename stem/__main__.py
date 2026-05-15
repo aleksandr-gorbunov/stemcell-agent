@@ -10,11 +10,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from stem.agent.base_tools import Phase
 from stem.orchestrator.runner import (
     RunConfig,
     reject_agent,
     run_evaluation,
-    run_naive_baseline,
+    run_inference,
     run_training,
     save_agent,
 )
@@ -106,23 +107,23 @@ def cmd_train(args) -> int:
     runcfg = _build_runconfig(args, domain_dir=domain_dir, evals_dir=evals_dir)
     stopcfg = StopConfig(budget_max_iterations=args.max_iterations)
     summary = asyncio.run(run_training(runcfg, stopcfg))
-    print(json.dumps(summary, indent=2, default=str))
+    _print_summary(summary)
     return 0
 
 
 def cmd_evaluate(args) -> int:
-    """Evaluate either the current agent_workspace/ (READY) or a saved trained agent."""
+    """Evaluate the current agent_workspace/ (READY) or a saved trained agent."""
+    phase = Phase.INFERENCE
     if args.load:
         trained_dir = Path(args.load).resolve()
         if not trained_dir.exists():
             raise SystemExit(f"trained agent not found: {trained_dir}")
         ws = trained_dir / "agent_workspace"
         metadata_path = trained_dir / "metadata.json"
-        if metadata_path.exists():
-            meta = json.loads(metadata_path.read_text())
-            domain_path = args.domain_dir or meta.get("domain_path")
-        else:
-            domain_path = args.domain_dir
+        meta = json.loads(metadata_path.read_text()) if metadata_path.exists() else {}
+        if meta.get("is_baseline"):
+            phase = Phase.BASELINE
+        domain_path = args.domain_dir or meta.get("domain_path")
         if not domain_path:
             raise SystemExit(
                 "could not determine domain to evaluate against; provide --domain or ensure metadata.json has domain_path"
@@ -140,8 +141,9 @@ def cmd_evaluate(args) -> int:
         domain_dir=domain_dir,
         evals_dir=evals_dir,
         model=args.model or os.environ.get("STEMCELL_MODEL", "gpt-5.5"),
+        phase=phase,
     ))
-    print(json.dumps(summary, indent=2, default=str))
+    _print_summary(summary)
     return 0
 
 
@@ -170,18 +172,33 @@ def cmd_reject(args) -> int:
     return 0
 
 
-def cmd_baseline(args) -> int:
-    domain_dir = _resolve_domain_dir(args.domain_dir)
-    evals_dir = _resolve_evals_dir(args, domain_dir)
-    runcfg = _build_runconfig(args, domain_dir=domain_dir, evals_dir=evals_dir)
-    summary = asyncio.run(run_naive_baseline(runcfg))
-    print(json.dumps(summary, indent=2, default=str))
+def cmd_inference(args) -> int:
+    """Run a trained agent on a single ad-hoc instruction."""
+    trained_dir = Path(args.load).resolve()
+    if not trained_dir.exists():
+        raise SystemExit(f"trained agent not found: {trained_dir}")
+    ws = trained_dir / "agent_workspace"
+    metadata_path = trained_dir / "metadata.json"
+    meta = json.loads(metadata_path.read_text()) if metadata_path.exists() else {}
+    domain_path = args.domain_dir or meta.get("domain_path")
+    if not domain_path:
+        raise SystemExit("provide --domain or ensure metadata.json has domain_path")
+    domain_dir = _resolve_domain_dir(domain_path)
+    summary = asyncio.run(run_inference(
+        workspace_dir=ws,
+        domain_dir=domain_dir,
+        instruction=args.instruction,
+        model=args.model or os.environ.get("STEMCELL_MODEL", "gpt-5.5"),
+    ))
+    _print_summary(summary)
     return 0
 
 
-def cmd_inference(args) -> int:
-    """Alias for `stem evaluate --load ...`."""
-    return cmd_evaluate(args)
+def _print_summary(summary: dict) -> None:
+    print(json.dumps(summary, indent=2, default=str))
+    path = summary.get("results_path")
+    if path:
+        print(f"\nResults written to: {path}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------------------
@@ -214,13 +231,12 @@ def main(argv: list[str] | None = None) -> int:
     p_reject.add_argument("--reason", help="Reason to record (will be visible to the agent in its failure log)")
     p_reject.set_defaults(func=cmd_reject)
 
-    p_base = sub.add_parser("baseline", help="Run naive baseline (empty workspace, base tools only)")
-    add_common_args(p_base)
-    p_base.set_defaults(func=cmd_baseline)
-
-    p_inf = sub.add_parser("inference", help="Alias for `evaluate --load <trained_agents path>`")
-    add_common_args(p_inf, require_domain=False)
-    p_inf.add_argument("--load", required=True)
+    p_inf = sub.add_parser("inference", help="Run a trained agent on an ad-hoc instruction")
+    p_inf.add_argument("--load", required=True, help="Path to trained_agents/<name>/")
+    p_inf.add_argument("--domain", dest="domain_dir",
+                       help="Path to domains/<name>/ (defaults to the saved metadata's domain_path)")
+    p_inf.add_argument("--instruction", required=True, help="The user's request to the agent")
+    p_inf.add_argument("--model", help="Override main agent model (STEMCELL_MODEL)")
     p_inf.set_defaults(func=cmd_inference)
 
     args = parser.parse_args(argv)

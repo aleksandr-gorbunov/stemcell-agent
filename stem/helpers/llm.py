@@ -6,7 +6,7 @@ output). Synchronous because it's invoked from subprocess-launched scripts,
 not from the async orchestrator.
 
 The model is fixed by the user via the `STEMCELL_TOOL_MODEL` environment
-variable — the agent cannot override it. This keeps cost and capability of
+variable; the agent cannot override it. This keeps cost and capability of
 tool-internal LLM calls under the user's control independent of whatever the
 main agent is running.
 
@@ -35,7 +35,6 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any
 
 from openai import OpenAI
 

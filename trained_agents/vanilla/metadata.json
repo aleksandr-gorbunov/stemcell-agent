@@ -1,0 +1,5 @@
+{
+  "name": "vanilla",
+  "is_baseline": true,
+  "description": "Untrained stem agent. Empty workspace, base tools only. Use as the baseline control for any domain: `stem evaluate --load trained_agents/vanilla --domain domains/<name>`."
+}

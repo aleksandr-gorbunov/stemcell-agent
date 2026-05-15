@@ -76,7 +76,7 @@ def render_initialization_context(domain: DomainDefinition) -> str:
         "This is the very first iteration. Your workspace is empty.",
         "",
         "Read the domain description below and inspect the available materials. Then write an "
-        "initial `KNOWLEDGE.md` capturing your first impression of the domain — what you think the "
+        "initial `KNOWLEDGE.md` capturing your first impression of the domain: what you think the "
         "domain is about, what entities are likely involved, what you will need to investigate.",
         "",
         "Do not yet attempt any tasks. The orchestrator will transition you to SELF_MODIFICATION "
@@ -101,9 +101,10 @@ def render_self_modification_context(
     workspace_summary: str,
     task_view: list[dict],
     forcing_message: str | None = None,
+    last_attempt: dict | None = None,
 ) -> str:
     lines = [
-        f"# Phase: SELF_MODIFICATION — iteration {iteration}",
+        f"# Phase: SELF_MODIFICATION (iteration {iteration})",
         "",
         "Build and refine your specialization. Create skills under `skills/<name>/SKILL.md` and "
         "write Python scripts under `skills/<name>/tools/<name>.py`. Update `KNOWLEDGE.md` and "
@@ -111,13 +112,16 @@ def render_self_modification_context(
         "",
         "You may not call `submit_attempt` in this phase. When ready to see how your current "
         "workspace performs on the task list, call `enter_self_testing()`.",
+    ]
+    lines.extend(_render_previous_attempt(last_attempt))
+    lines.extend([
         "",
         "## Current workspace state",
         workspace_summary,
         "",
         "## Tasks and current statuses (visible for context, not attempted in this phase)",
         json.dumps(task_view, indent=2, ensure_ascii=False),
-    ]
+    ])
     if forcing_message:
         lines.extend(["", "## IMPORTANT FORCING MESSAGE", forcing_message])
     return "\n".join(lines)
@@ -126,41 +130,94 @@ def render_self_modification_context(
 def render_self_testing_context(
     iteration: int,
     workspace_summary: str,
-    task_view: list[dict],
+    focused_task: dict,
+    other_task_statuses: list[dict],
     forcing_message: str | None = None,
+    last_attempt: dict | None = None,
 ) -> str:
+    focused_payload = {k: v for k, v in focused_task.items() if k != "verification"}
     lines = [
-        f"# Phase: SELF_TESTING — iteration {iteration}",
+        f"# Phase: SELF_TESTING (iteration {iteration})",
         "",
         "Your workspace is frozen for this phase. You cannot write, append, or delete files, and "
-        "you cannot create new skills or tools. Attempt tasks via `submit_attempt(task_id=..., "
-        "summary=..., answer=...)`. Verification runs after this iteration ends.",
+        "you cannot create new skills or tools. Attempt the focused task below via "
+        "`submit_attempt(task_id=..., summary=..., answer=...)`. Verification runs after this iteration "
+        "ends. The orchestrator picks a randomly-chosen task for each SELF_TESTING iteration; you do "
+        "not get to choose, so prepare your workspace to handle any task in the set.",
         "",
-        "When testing has surfaced something you want to fix, call `enter_self_modification()`. "
-        "When you believe your workspace is ready to be saved as a finalized trained agent, call "
-        "`declare_ready_for_inference()`.",
+        "**If any task in the status list below shows status=failed, you should call "
+        "`enter_self_modification()` instead of attempting it again right away.** Update KNOWLEDGE.md, "
+        "refine the relevant skill, or at minimum add a FAILURE_LOG.md entry explaining what was wrong. "
+        "Retrying the same task against the same workspace will produce the same failure. After "
+        "revising, call `enter_self_testing()` to come back and re-attempt.",
+        "",
+        "When you believe you are done with all tasks, call `declare_ready_for_inference()`.",
+    ]
+    lines.extend(_render_previous_attempt(last_attempt))
+    lines.extend([
         "",
         "## Current workspace state",
         workspace_summary,
         "",
-        "## Tasks and current statuses",
-        json.dumps(task_view, indent=2, ensure_ascii=False),
-    ]
+        "## Task to attempt this iteration",
+        json.dumps(focused_payload, indent=2, ensure_ascii=False),
+    ])
+    if other_task_statuses:
+        lines.extend(["", "## Other tasks (status only)"])
+        for st in other_task_statuses:
+            lines.append(
+                f"  - {st['task_id']} (cap={st.get('capability', '?')}, "
+                f"status={st.get('status', '?')}, attempts={st.get('attempts', 0)})"
+            )
     if forcing_message:
         lines.extend(["", "## IMPORTANT FORCING MESSAGE", forcing_message])
     return "\n".join(lines)
 
 
-def render_inference_context(
-    workspace_summary: str,
-    task: dict,
-) -> str:
-    return "\n".join([
-        "# Phase: INFERENCE",
+def _render_previous_attempt(last_attempt: dict | None) -> list[str]:
+    if not last_attempt:
+        return []
+    passed = bool(last_attempt.get("passed"))
+    answer = last_attempt.get("answer")
+    try:
+        answer_text = json.dumps(answer, indent=2, ensure_ascii=False)
+    except (TypeError, ValueError):
+        answer_text = repr(answer)
+    block = [
         "",
-        "You are a previously trained agent loaded for use. Your workspace is frozen and read-only. "
-        "You will be given one task at a time; solve it using the skills, tools, and knowledge you "
-        "accumulated during training. You may not write new artifacts.",
+        "## Previous attempt",
+        f"Task: {last_attempt.get('task_id', '?')}",
+        f"Your answer: {answer_text}",
+        f"Result: {'PASSED' if passed else 'FAILED'}",
+    ]
+    trace = last_attempt.get("tool_call_log") or []
+    if trace:
+        block.append("")
+        block.append("How you got there (tool calls in order):")
+        for i, call in enumerate(trace, 1):
+            name = call.get("name", "?")
+            args = call.get("args", {}) or {}
+            args_str = ", ".join(f"{k}={json.dumps(v, ensure_ascii=False)}" for k, v in args.items())
+            block.append(f"  {i}. {name}({args_str})" if args_str else f"  {i}. {name}()")
+    if not passed:
+        block.append("")
+        block.append(
+            "That attempt did not pass. The textbook (`DESCRIPTION.md` and `materials/`) and the "
+            "data have not changed; think carefully about whether your answer truly matched what "
+            "the task asked, and whether the path above did the right kind of investigation. It "
+            "may be worth re-reading the relevant section, considering where your skill or "
+            "knowledge might be off, and revising before trying again."
+        )
+    return block
+
+
+def render_evaluation_context(workspace_summary: str, task: dict) -> str:
+    return "\n".join([
+        "# Phase: INFERENCE (evaluation)",
+        "",
+        "You are a previously trained agent loaded for evaluation against a known task. "
+        "Your workspace is frozen and read-only. Solve the task using the skills, tools, and "
+        "knowledge you accumulated during training. You may not write new artifacts.",
         "",
         "## Current workspace state",
         workspace_summary,
@@ -177,10 +234,26 @@ def render_baseline_context(task: dict) -> str:
         "# Phase: BASELINE",
         "",
         "You have just been instantiated. Your workspace is empty and writes are disabled. You have "
-        "base tools only — no skills, no authored tools, no knowledge file, no failure log. You will "
+        "base tools only: no skills, no authored tools, no knowledge file, no failure log. You will "
         "be given tasks one at a time. Solve each using base tools, then call "
         "`submit_attempt(task_id=..., summary=..., answer=...)`.",
         "",
         "## Task",
         json.dumps({k: v for k, v in task.items() if k != "verification"}, indent=2, ensure_ascii=False),
+    ])
+
+
+def render_inference_context(workspace_summary: str, instruction: str) -> str:
+    return "\n".join([
+        "# Phase: INFERENCE",
+        "",
+        "You are a previously trained agent loaded for use. Your workspace is read-only. "
+        "Answer the user's request below using your skills, knowledge, and base tools. "
+        "Produce your answer as your final message; submit_attempt is not available in this mode.",
+        "",
+        "## Current workspace state",
+        workspace_summary,
+        "",
+        "## User request",
+        instruction,
     ])
